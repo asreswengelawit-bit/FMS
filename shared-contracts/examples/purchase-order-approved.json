@@ -1,0 +1,19 @@
+{
+  "eventId": "b6f3c2a0-1e4d-4a2b-9c11-8e2f5a0d7c34",
+  "eventType": "PurchaseOrderApproved",
+  "occurredAt": "2026-07-08T12:00:00Z",
+  "source": "prms-service",
+  "data": {
+    "purchaseOrderId": 102,
+    "purchaseRequestId": 40,
+    "supplierId": 7,
+    "warehouseId": 2,
+    "totalAmount": 150000,
+    "currency": "ETB",
+    "approvedBy": "user-12",
+    "lines": [
+      { "itemId": 501, "quantity": 100, "unitPrice": 1500 },
+      { "itemId": 502, "quantity": 20, "unitPrice": 0 }
+    ]
+  }
+}

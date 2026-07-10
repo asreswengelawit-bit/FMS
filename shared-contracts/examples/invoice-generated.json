@@ -1,0 +1,17 @@
+{
+  "eventId": "7e0b9f44-3c21-4d8a-b6f0-9a8c7d6e5f40",
+  "eventType": "InvoiceGenerated",
+  "occurredAt": "2026-07-09T10:15:00Z",
+  "source": "fms-service",
+  "data": {
+    "invoiceId": 300,
+    "invoiceNumber": "INV-0300",
+    "type": "AR",
+    "partyRef": 21,
+    "salesOrderId": 7,
+    "amount": 90000,
+    "currency": "ETB",
+    "dueDate": "2026-08-08",
+    "status": "ISSUED"
+  }
+}
