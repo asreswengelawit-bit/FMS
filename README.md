@@ -141,6 +141,11 @@ Contracts are additive; breaking changes need consumer sign-off and a deprecatio
   (+ `status` / approval fields where relevant).
 - **RBAC permissions** named `<module>.<entity>.<action>` (`hrm.employee.create`,
   `prms.purchase_order.approve`, `fms.journal.post`). Write endpoints protected; menus permission-aware.
+- **Authentication** is centralized in **Keycloak** (OIDC/JWT). Each service is an OAuth2
+  resource server that validates tokens and enforces the RBAC permissions above. Follow the
+  per-module guide to secure your service:
+  [`docs/architecture/module-auth-integration.md`](docs/architecture/module-auth-integration.md).
+  Infra & daily run: [`docs/architecture/keycloak-auth.md`](docs/architecture/keycloak-auth.md).
 - **Global exception handler**, structured logging, validation on all inputs.
 
 ---
