@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit config for INSA-ERP. Tuned to the Golden Rules in README.md.
+language: en-US
+
+reviews:
+  profile: chill                 # concise, high-signal reviews (use "assertive" for stricter)
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  poem: false
+  collapse_walkthrough: false
+
+  # Feature/fix branches target `develop`, never `main` (README §3).
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - develop
+      - main
+
+  # Skip noise: binaries, build output, generated caches.
+  path_filters:
+    - "!**/*.pdf"
+    - "!**/.gradle/**"
+    - "!**/build/**"
+    - "!**/node_modules/**"
+    - "!**/.next/**"
+
+  # Repo-specific review guidance by path.
+  path_instructions:
+    - path: "services/**/*.java"
+      instructions: >-
+        Enforce the Golden Rules: a service must NEVER read/write another module's
+        schema or tables — cross-service access is REST (/api/v1/...) or RabbitMQ events
+        only. Business tables need audit fields (created_at, created_by, updated_at,
+        updated_by). Every write endpoint must be permission-protected with
+        @PreAuthorize("hasAuthority('<module>.<entity>.<action>')") matching the RBAC
+        naming. Expect a global exception handler and validation on all inputs. Flag any
+        cross-module import or direct call into another service's package/tables.
+    - path: "services/**/src/main/resources/db/migration/*.sql"
+      instructions: >-
+        Flyway migrations are IMMUTABLE once merged — flag any edit to an existing
+        V<n>__*.sql file; changes must be a new, higher version. Check version numbers
+        don't collide within a module. No manual/destructive schema edits outside Flyway.
+    - path: "services/**/*openapi*.{yaml,yml}"
+      instructions: >-
+        API contract changes must be additive and backward compatible. Flag breaking
+        changes (removed/renamed fields, changed types, removed endpoints) — they need
+        consumer sign-off. Endpoints use /api/v1/<plural-resource> and the shared
+        response envelope { success, message, data, timestamp }.
+    - path: "shared-contracts/events/**"
+      instructions: >-
+        Event names are PascalCase past-tense (PurchaseOrderApproved, StockReceived).
+        Contracts are additive; flag breaking payload changes. Producing service owns the
+        event; consumers must review changes.
+    - path: "frontend/src/features/shared/**"
+      instructions: >-
+        Shared frontend infrastructure (high-conflict). Scrutinize changes carefully —
+        these affect every module. Confirm the PR description justifies touching it.
+    - path: "frontend/**/*.{ts,tsx}"
+      instructions: >-
+        Protected routes go through middleware.ts; attach the Keycloak bearer token via
+        the shared http-client. Menus/actions should be permission-aware.
+    - path: "{docker-compose.yml,Makefile,package.json,.github/workflows/**}"
+      instructions: >-
+        Root/infra and CI files are high-conflict shared files (README §4). Changes need
+        clear justification in the PR description and lead review.
+
+chat:
+  auto_reply: true
