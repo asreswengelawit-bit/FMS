@@ -1,0 +1,75 @@
+{
+  "realm": "erp",
+  "enabled": true,
+  "displayName": "INSA-ERP",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Full ERP administrator" },
+      { "name": "hrm_user", "description": "HRM module access" },
+      { "name": "prms_user", "description": "PRMS module access" },
+      { "name": "mms_user", "description": "MMS module access" },
+      { "name": "crm_user", "description": "CRM module access" },
+      { "name": "fms_user", "description": "FMS module access" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "erp-frontend",
+      "name": "ERP Next.js Frontend",
+      "description": "Public OIDC client for the shared Next.js app (auth-code + PKCE).",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:3000",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      }
+    },
+    {
+      "clientId": "erp-backend",
+      "name": "ERP Backend Services",
+      "description": "Confidential client for service-to-service calls (client credentials). Spring resource servers only validate JWTs; they do not need a client, but this enables machine-to-machine auth. Regenerate the secret after first import.",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "replace-me-after-first-import",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "erp-admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "erp-admin@example.com",
+      "firstName": "ERP",
+      "lastName": "Admin",
+      "credentials": [
+        { "type": "password", "value": "change-me", "temporary": true }
+      ],
+      "realmRoles": ["admin", "hrm_user", "prms_user", "mms_user", "crm_user", "fms_user"]
+    }
+  ]
+}
