@@ -31,8 +31,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     // Runs at sign-in (account present) and on every token refresh.
     async jwt({ token, account }) {
-      if (account?.access_token) {
+      if (account) {
         token.accessToken = account.access_token;
+        token.idToken = account.id_token; // needed for Keycloak federated logout
         token.roles = decodeRealmRoles(account.access_token);
       }
       return token;
@@ -41,6 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       session.roles = (token.roles as string[] | undefined) ?? [];
       session.accessToken = token.accessToken as string | undefined;
+      session.idToken = token.idToken as string | undefined;
       return session;
     },
   },

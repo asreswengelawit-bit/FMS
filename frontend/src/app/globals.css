@@ -31,6 +31,13 @@ a {
   max-width: 420px;
 }
 
+.logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  margin: 0 auto 0.5rem;
+}
+
 .btn {
   display: inline-block;
   border: none;
@@ -70,10 +77,22 @@ a {
 }
 
 .sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   color: #fff;
   font-weight: 700;
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 6px;
+  padding: 2px;
 }
 
 .sidebar a {

@@ -4,6 +4,11 @@ export default function LoginPage() {
   return (
     <div className="center-screen">
       <div className="card">
+        <img
+          src="/insa.jpg"
+          alt="Information Network Security Administration"
+          className="logo"
+        />
         <h1>INSA-ERP</h1>
         <p className="muted">Sign in to continue to your dashboard.</p>
         <form

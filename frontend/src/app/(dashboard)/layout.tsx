@@ -1,4 +1,5 @@
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import { federatedSignOut } from "@/features/shared/auth/actions";
 import { modulesForRoles } from "@/features/shared/config/roles";
 
 export default async function DashboardLayout({
@@ -14,7 +15,10 @@ export default async function DashboardLayout({
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="brand">INSA-ERP</div>
+        <div className="brand">
+          <img src="/insa.jpg" alt="INSA" className="brand-logo" />
+          <span>INSA-ERP</span>
+        </div>
         {modules.length === 0 && (
           <span className="muted">No modules assigned</span>
         )}
@@ -30,12 +34,7 @@ export default async function DashboardLayout({
           <span className="muted">
             Signed in as <strong>{name}</strong>
           </span>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
+          <form action={federatedSignOut}>
             <button type="submit" className="btn btn-ghost">
               Sign out
             </button>
