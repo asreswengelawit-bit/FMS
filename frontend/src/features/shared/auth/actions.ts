@@ -23,6 +23,9 @@ export async function federatedSignOut() {
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
   const params = new URLSearchParams({
+    // client_id lets Keycloak validate the redirect even when id_token_hint is
+    // absent (e.g. sessions created before id_token was captured).
+    client_id: process.env.KEYCLOAK_CLIENT_ID ?? "",
     post_logout_redirect_uri: `${origin}/login`,
   });
   if (idToken) params.set("id_token_hint", idToken);
