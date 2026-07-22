@@ -15,6 +15,38 @@
     "realm": [
       { "name": "admin", "description": "Full ERP administrator" },
       { "name": "hrm_user", "description": "HRM module access" },
+
+      {
+        "name": "hrm_admin",
+        "description": "HR Admin - full HRM administration",
+        "composite": true,
+        "composites": { "realm": ["hrm_user"] }
+      },
+      {
+        "name": "hrm_employee",
+        "description": "Employee - HRM self-service access",
+        "composite": true,
+        "composites": { "realm": ["hrm_user"] }
+      },
+      {
+        "name": "hrm_operations_manager",
+        "description": "HR Operations Manager",
+        "composite": true,
+        "composites": { "realm": ["hrm_user"] }
+      },
+      {
+        "name": "hrm_recruitment_officer",
+        "description": "Recruitment Officer",
+        "composite": true,
+        "composites": { "realm": ["hrm_user"] }
+      },
+      {
+        "name": "hrm_department_manager",
+        "description": "Department Manager",
+        "composite": true,
+        "composites": { "realm": ["hrm_user"] }
+      },
+
       { "name": "prms_user", "description": "PRMS module access" },
       { "name": "mms_user", "description": "MMS module access" },
       { "name": "crm_user", "description": "CRM module access" },
