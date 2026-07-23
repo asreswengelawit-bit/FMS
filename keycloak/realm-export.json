@@ -48,6 +48,44 @@
       },
 
       { "name": "prms_user", "description": "PRMS module access" },
+
+      {
+        "name": "prms_procurement_manager",
+        "description": "Procurement Manager - full procurement access",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+      {
+        "name": "prms_procurement_officer",
+        "description": "Procurement Officer - daily procurement operations",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+      {
+        "name": "prms_requester",
+        "description": "Requester (Employee) - creates purchase requests",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+      {
+        "name": "prms_approver",
+        "description": "Approver - approves/rejects purchase requests",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+      {
+        "name": "prms_supplier",
+        "description": "Supplier - external supplier-facing access",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+      {
+        "name": "prms_receiving_officer",
+        "description": "Receiving Officer - goods receipt and inspection",
+        "composite": true,
+        "composites": { "realm": ["prms_user"] }
+      },
+
       { "name": "mms_user", "description": "MMS module access" },
       { "name": "crm_user", "description": "CRM module access" },
       { "name": "fms_user", "description": "FMS module access" }
