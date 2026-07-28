@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import StyledComponentsRegistry from "@/styles/registry";
+import { GlobalStyle } from "@/styles/global-style";
 
 export const metadata: Metadata = {
   title: "INSA-ERP",
@@ -13,7 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StyledComponentsRegistry>
+          <GlobalStyle />
+          {children}
+        </StyledComponentsRegistry>
+      </body>
     </html>
   );
 }
