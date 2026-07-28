@@ -9,7 +9,7 @@ import {
 
 export default function DepartmentDashboard() {
   return (
-    <div className="hrm">
+    <div>
       <PageHead
         title="My Department"
         subtitle="My Team · Team Attendance · Approvals"
@@ -18,15 +18,15 @@ export default function DepartmentDashboard() {
 
       <KpiRow
         items={[
-          { icon: "👥", value: "12", label: "Team Size", note: "Warehouse dept.", tone: "blue" },
-          { icon: "🟢", value: "10", label: "Present Today", note: "83% attendance", tone: "green" },
-          { icon: "🌴", value: "1", label: "On Leave", note: "1 returning tomorrow", tone: "violet" },
-          { icon: "⏳", value: "2", label: "Pending Approvals", note: "Leave requests", tone: "amber" },
+          { icon: "users", value: "12", label: "Team Size", note: "Warehouse dept.", tone: "blue" },
+          { icon: "checkCircle", value: "10", label: "Present Today", note: "83% attendance", tone: "green" },
+          { icon: "leaf", value: "1", label: "On Leave", note: "1 returning tomorrow", tone: "violet" },
+          { icon: "clock", value: "2", label: "Pending Approvals", note: "Leave requests", tone: "amber" },
         ]}
       />
 
       <PanelRow>
-        <Panel title="📈 My Team Attendance">
+        <Panel title="My Team Attendance" icon="activity">
           <ProgressList
             total={12}
             rows={[
@@ -37,7 +37,7 @@ export default function DepartmentDashboard() {
             ]}
           />
         </Panel>
-        <Panel title="✅ Pending Leave Approvals">
+        <Panel title="Pending Leave Approvals" icon="checkCircle">
           <ActivityList
             items={[
               { type: "Awaiting You", text: "Annual leave · Kebede Alemu · 24–26 Jul (3 days)", date: "submitted 20 Jul" },

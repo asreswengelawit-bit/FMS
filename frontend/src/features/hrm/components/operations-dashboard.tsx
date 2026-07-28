@@ -9,7 +9,7 @@ import {
 
 export default function OperationsDashboard() {
   return (
-    <div className="hrm">
+    <div>
       <PageHead
         title="HR Operations"
         subtitle="Attendance · Leave · Payroll Support · Reports"
@@ -18,15 +18,15 @@ export default function OperationsDashboard() {
 
       <KpiRow
         items={[
-          { icon: "📅", value: "3", label: "Leaves to Process", note: "Awaiting HR action", tone: "amber" },
-          { icon: "⛔", value: "1", label: "Absent Today", note: "Follow-up needed", tone: "red" },
-          { icon: "⏰", value: "1", label: "Late Today", note: "Flagged for review", tone: "amber" },
-          { icon: "✅", value: "107", label: "Active Employees", note: "Payroll eligible", tone: "green" },
+          { icon: "calendar", value: "3", label: "Leaves to Process", note: "Awaiting HR action", tone: "amber" },
+          { icon: "userX", value: "1", label: "Absent Today", note: "Follow-up needed", tone: "red" },
+          { icon: "clock", value: "1", label: "Late Today", note: "Flagged for review", tone: "amber" },
+          { icon: "userCheck", value: "107", label: "Active Employees", note: "Payroll eligible", tone: "green" },
         ]}
       />
 
       <PanelRow>
-        <Panel title="📈 Today's Attendance">
+        <Panel title="Today's Attendance" icon="activity">
           <ProgressList
             total={8}
             rows={[
@@ -38,7 +38,7 @@ export default function OperationsDashboard() {
             ]}
           />
         </Panel>
-        <Panel title="🧾 Payroll Support Queue">
+        <Panel title="Payroll Support Queue" icon="receipt">
           <ActivityList
             items={[
               { type: "OvertimeReview", text: "12 overtime entries pending verification (Warehouse)", date: "due 25 Jul" },
