@@ -11,7 +11,7 @@ import {
 
 export default function AdminDashboard() {
   return (
-    <div className="hrm">
+    <div>
       <PageHead
         title="Human Resource Management System"
         subtitle="Departments · Positions · Employees · Attendance · Leave · Payroll Support · Assignment History · Reports · Audit"
@@ -20,17 +20,17 @@ export default function AdminDashboard() {
 
       <KpiRow
         items={[
-          { icon: "👥", value: "120", label: "Total Employees", note: "8 departments", tone: "blue" },
-          { icon: "✅", value: "107", label: "Active Employees", note: "89.2% active rate", tone: "green" },
-          { icon: "📅", value: "3", label: "Pending Leaves", note: "Awaiting approval", tone: "amber" },
-          { icon: "⛔", value: "1", label: "Absent Today", note: "Late: 1 employees", tone: "red" },
-          { icon: "🟢", value: "4", label: "Present Today", note: "50% attendance rate", tone: "green" },
-          { icon: "➕", value: "1", label: "New Hires / Month", note: "July 2025", tone: "violet" },
+          { icon: "users", value: "120", label: "Total Employees", note: "8 departments", tone: "blue" },
+          { icon: "userCheck", value: "107", label: "Active Employees", note: "89.2% active rate", tone: "green" },
+          { icon: "calendar", value: "3", label: "Pending Leaves", note: "Awaiting approval", tone: "amber" },
+          { icon: "userX", value: "1", label: "Absent Today", note: "Late: 1 employees", tone: "red" },
+          { icon: "checkCircle", value: "4", label: "Present Today", note: "50% attendance rate", tone: "green" },
+          { icon: "userPlus", value: "1", label: "New Hires / Month", note: "July 2025", tone: "violet" },
         ]}
       />
 
       <PanelRow>
-        <Panel title="📊 Employee Count by Department">
+        <Panel title="Employee Count by Department" icon="chartBar">
           <BarChart
             max={36}
             data={[
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
             ]}
           />
         </Panel>
-        <Panel title="📈 Today's Attendance">
+        <Panel title="Today's Attendance" icon="activity">
           <ProgressList
             total={8}
             rows={[
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
       </PanelRow>
 
       <PanelRow>
-        <Panel title="🗓️ Leave Request Summary">
+        <Panel title="Leave Request Summary" icon="calendar">
           <StatGrid
             items={[
               { label: "Pending", value: 3, tone: "amber" },
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
             ]}
           />
         </Panel>
-        <Panel title="🕓 Recent HR Activity">
+        <Panel title="Recent HR Activity" icon="clock">
           <ActivityList
             items={[
               { type: "EmployeeCreated", text: "New employee Meron Kebede onboarded to IT & Security by Hirut Mekonen", date: "2021-09-15" },

@@ -9,7 +9,7 @@ import {
 
 export default function EmployeeDashboard() {
   return (
-    <div className="hrm">
+    <div>
       <PageHead
         title="My HR Portal"
         subtitle="My Attendance · My Leave · My Profile"
@@ -18,15 +18,15 @@ export default function EmployeeDashboard() {
 
       <KpiRow
         items={[
-          { icon: "🌴", value: "12", label: "Leave Balance", note: "Annual days left", tone: "green" },
-          { icon: "⏳", value: "1", label: "Pending Requests", note: "Awaiting approval", tone: "amber" },
-          { icon: "📆", value: "95%", label: "Attendance", note: "This month", tone: "blue" },
-          { icon: "⏱️", value: "168h", label: "Worked Hours", note: "This month", tone: "violet" },
+          { icon: "leaf", value: "12", label: "Leave Balance", note: "Annual days left", tone: "green" },
+          { icon: "clock", value: "1", label: "Pending Requests", note: "Awaiting approval", tone: "amber" },
+          { icon: "calendar", value: "95%", label: "Attendance", note: "This month", tone: "blue" },
+          { icon: "activity", value: "168h", label: "Worked Hours", note: "This month", tone: "violet" },
         ]}
       />
 
       <PanelRow>
-        <Panel title="📈 My Attendance This Week">
+        <Panel title="My Attendance This Week" icon="activity">
           <ProgressList
             total={8}
             rows={[
@@ -38,7 +38,7 @@ export default function EmployeeDashboard() {
             ]}
           />
         </Panel>
-        <Panel title="🕓 My Recent Leave Requests">
+        <Panel title="My Recent Leave Requests" icon="clock">
           <ActivityList
             items={[
               { type: "Pending", text: "Annual leave · 22–24 Jul 2025 (3 days)", date: "submitted 18 Jul" },
