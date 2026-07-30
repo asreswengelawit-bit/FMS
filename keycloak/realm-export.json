@@ -87,6 +87,26 @@
       },
 
       { "name": "mms_user", "description": "MMS module access" },
+
+      {
+        "name": "mms_inventory_manager",
+        "description": "Inventory Manager - full MMS operational control (read, create, edit, adjust, approve/issue, export)",
+        "composite": true,
+        "composites": { "realm": ["mms_user"] }
+      },
+      {
+        "name": "mms_store_keeper",
+        "description": "Store Keeper - daily warehouse operations (read, create, receive, adjust, export)",
+        "composite": true,
+        "composites": { "realm": ["mms_user"] }
+      },
+      {
+        "name": "mms_viewer",
+        "description": "Viewer - read-only access (dashboards, inventory, movements, reports)",
+        "composite": true,
+        "composites": { "realm": ["mms_user"] }
+      },
+
       { "name": "crm_user", "description": "CRM module access" },
       { "name": "fms_user", "description": "FMS module access" }
     ]
