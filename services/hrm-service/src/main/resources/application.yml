@@ -1,0 +1,83 @@
+# ============================================================================
+# hrm-service — Human Resource Management (Team 1)
+#
+# Database   : the shared Postgres, schema `hrm_schema` only (never another
+#              module's schema). Set DATABASE_URL in the repo-root .env and
+#              DatabaseUrlEnvironmentPostProcessor derives spring.datasource.*
+#              from it, pinned to currentSchema=hrm_schema.
+# Schema DDL : Flyway only (db/migration). ddl-auto stays at `validate` so a
+#              drift between entities and migrations fails the boot instead of
+#              silently corrupting the schema.
+# Auth       : OAuth2 resource server against the shared Keycloak `erp` realm.
+# ============================================================================
+spring:
+  application:
+    name: hrm-service
+
+  # Pick up the repo-root .env whether the service is started from its own
+  # directory or from the monorepo root.
+  config:
+    import:
+      - optional:file:./.env[.properties]
+      - optional:file:../../.env[.properties]
+
+  datasource:
+    # Left unset on purpose: DATABASE_URL wins, and SPRING_DATASOURCE_URL still
+    # overrides everything when a developer needs a one-off database.
+    hikari:
+      pool-name: hrm-pool
+      maximum-pool-size: ${HRM_DB_POOL_SIZE:10}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: hrm_schema
+        jdbc:
+          time_zone: UTC
+    show-sql: ${HRM_SHOW_SQL:false}
+
+  flyway:
+    enabled: true
+    schemas: hrm_schema
+    default-schema: hrm_schema
+    create-schemas: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/erp}
+
+server:
+  port: ${HRM_SERVICE_PORT:8081} # HRM 8081, PRMS 8082, MMS 8083, CRM 8084, FMS 8085
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  packages-to-scan: com.company.hrm
+  show-actuator: false
+
+logging:
+  level:
+    com.company.hrm: ${HRM_LOG_LEVEL:INFO}

@@ -1,0 +1,1 @@
+org.springframework.boot.EnvironmentPostProcessor=com.company.hrm.shared.config.DatabaseUrlEnvironmentPostProcessor
