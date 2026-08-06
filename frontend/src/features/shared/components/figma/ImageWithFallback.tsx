@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface ImageWithFallbackProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
+  src: any;
   fallbackSrc?: string;
 }
 
