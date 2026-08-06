@@ -1,0 +1,27 @@
+# Dependency & build outputs
+node_modules
+.next
+out
+build
+dist
+
+# Environment & secrets
+.env
+.env*.local
+
+# IDE & Editor files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git & Repository files
+.git
+.gitignore
+README*.md
+
+# Logs & temporary files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
