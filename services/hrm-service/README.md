@@ -4,7 +4,7 @@ Human Resource Management — **Team 1**. Owns the `hrm_schema` schema and every
 `/api/v1` listed below. Read the root [README](../../README.md) and the
 [HRM blueprint](../../docs/architecture/modules/hrm-blueprint.md) first.
 
-Spring Boot 4.1 · Java 21 · Gradle · PostgreSQL + Flyway · Keycloak (OAuth2 resource server).
+Spring Boot 4.1 · Java 21 · Maven · PostgreSQL + Flyway · Keycloak (OAuth2 resource server).
 
 ---
 
@@ -15,7 +15,7 @@ Spring Boot 4.1 · Java 21 · Gradle · PostgreSQL + Flyway · Keycloak (OAuth2 
 docker compose up -d
 
 cd services/hrm-service
-./gradlew bootRun
+./mvnw spring-boot:run
 ```
 
 Configuration comes from the repo-root `.env` (auto-imported):
@@ -36,7 +36,7 @@ Configuration comes from the repo-root `.env` (auto-imported):
 ## Test it
 
 ```bash
-./gradlew test      # needs Docker: Testcontainers starts Postgres
+./mvnw verify       # needs Docker: Testcontainers starts Postgres
 ```
 
 The suite boots the service against a real Postgres, applies every migration and lets

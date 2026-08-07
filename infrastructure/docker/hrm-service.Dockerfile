@@ -16,15 +16,16 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /workspace
 
-# Wrapper and build scripts first, so dependency resolution is cached separately
-# from source changes.
-COPY services/hrm-service/gradlew services/hrm-service/settings.gradle services/hrm-service/build.gradle ./
-COPY services/hrm-service/gradle ./gradle
-RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
+# The POM and wrapper first, so dependency resolution is cached separately from
+# source changes.
+COPY services/hrm-service/mvnw ./
+COPY services/hrm-service/.mvn ./.mvn
+COPY services/hrm-service/pom.xml ./
+RUN chmod +x mvnw && ./mvnw -B dependency:go-offline
 
 COPY services/hrm-service/src ./src
 # Tests need Docker (Testcontainers), so they run in CI, not in the image build.
-RUN ./gradlew --no-daemon bootJar -x test
+RUN ./mvnw -B clean package -DskipTests
 
 # ---- Run stage ----
 FROM eclipse-temurin:21-jre
@@ -34,7 +35,7 @@ WORKDIR /app
 RUN groupadd --system spring && useradd --system --gid spring spring
 USER spring:spring
 
-COPY --from=build /workspace/build/libs/*.jar app.jar
+COPY --from=build /workspace/target/*.jar app.jar
 
 EXPOSE 8081
 

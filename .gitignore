@@ -4,7 +4,8 @@
 *.env
 !.env.example
 
-# ---- Java / Gradle ----
+# ---- Java (Maven / Gradle) ----
+target/
 .gradle/
 build/
 *.class
