@@ -6,6 +6,7 @@ declare module "next-auth" {
     roles: string[];
     accessToken?: string;
     idToken?: string;
+    error?: "RefreshAccessTokenError";
     user: DefaultSession["user"];
   }
 }
@@ -14,6 +15,9 @@ declare module "next-auth/jwt" {
   interface JWT {
     roles?: string[];
     accessToken?: string;
+    accessTokenExpires?: number;
+    refreshToken?: string;
     idToken?: string;
+    error?: "RefreshAccessTokenError";
   }
 }

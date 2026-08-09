@@ -8,9 +8,11 @@ import { federatedSignOut } from "@/features/shared/auth/actions";
 import { Icon } from "@/features/shared/components/icons";
 import { theme } from "@/styles/theme";
 import type { ModuleDef } from "@/features/shared/config/roles";
+import { CRM_NAV } from "@/features/shared/config/navigation/crm-nav";
 
 const MODULE_TITLE: Record<string, string> = {
   hrm: "Human Resource Management",
+  crm: "Sales & Customer Relationship Management",
 };
 
 const p = (label: string) => ({ label, path: "/hrm" });
@@ -77,7 +79,9 @@ export default function AppShell({
             const items =
               m.key === "hrm"
                 ? (HR_SUBNAV[hrRole] ?? HR_SUBNAV.hrm_user)
-                : [{ label: "Dashboard", path: m.path }];
+                : m.key === "crm"
+                  ? [...CRM_NAV]
+                  : [{ label: "Dashboard", path: m.path }];
             const isOpen = open === m.key;
             const isActive = active?.key === m.key;
             return (
@@ -96,16 +100,21 @@ export default function AppShell({
                 </NavButton>
                 {!collapsed && isOpen && (
                   <Sub>
-                    {items.map((it, i) => (
-                      <SubLink
-                        key={it.label}
-                        href={it.path}
-                        $active={i === 0 && isActive}
-                      >
-                        <Bullet />
-                        {it.label}
-                      </SubLink>
-                    ))}
+                    {items.map((it) => {
+                      const subActive =
+                        pathname === it.path ||
+                        (it.path !== m.path && pathname.startsWith(it.path + "/"));
+                      return (
+                        <SubLink
+                          key={it.label}
+                          href={it.path}
+                          $active={subActive}
+                        >
+                          <Bullet />
+                          {it.label}
+                        </SubLink>
+                      );
+                    })}
                   </Sub>
                 )}
               </div>
