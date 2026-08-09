@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCustomer } from "@/features/crm/api/customers";
 import { CrmApiError } from "@/features/crm/api/crm-client";
+import CrmModuleHeader from "@/features/crm/components/CrmModuleHeader";
+import { theme } from "@/styles/theme";
 
 export default async function CustomerDetailPage({
   params,
@@ -30,18 +32,25 @@ export default async function CustomerDetailPage({
 
     return (
       <div>
+        <CrmModuleHeader section="Customer Detail" />
         <Link
           href="/crm/customers"
           style={{ color: "#64748b", fontSize: "0.85rem", fontWeight: 600 }}
         >
           ← Back to customers
         </Link>
-        <h1 style={{ margin: "0.5rem 0 0", color: "#0a1f44", fontSize: "1.45rem" }}>
-          {customer.companyName || customer.contactName || customer.customerNumber}
-        </h1>
-        <p style={{ margin: "0.35rem 0 1.25rem", color: "#6b7280", fontSize: "0.92rem" }}>
-          Customer detail
-        </p>
+        <h2
+          style={{
+            margin: "0.6rem 0 1rem",
+            color: theme.navy,
+            fontSize: "1.35rem",
+            fontWeight: 800,
+          }}
+        >
+          {customer.companyName ||
+            customer.contactName ||
+            customer.customerNumber}
+        </h2>
 
         <div
           style={{
@@ -50,6 +59,7 @@ export default async function CustomerDetailPage({
             borderRadius: 12,
             overflow: "hidden",
             maxWidth: 720,
+            boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
           }}
         >
           {rows.map(([label, value]) => (

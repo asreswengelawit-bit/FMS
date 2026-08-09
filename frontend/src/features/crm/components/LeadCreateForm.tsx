@@ -4,93 +4,84 @@ import { useActionState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import {
-  createCustomerAction,
-  type CreateCustomerState,
-} from "@/features/crm/actions/customers";
+  createLeadAction,
+  type LeadActionState,
+} from "@/features/crm/actions/leads";
 import { theme } from "@/styles/theme";
 
-const initial: CreateCustomerState = { ok: true };
+const initial: LeadActionState = { ok: true };
 
-const CUSTOMER_TYPES = [
-  "GOVERNMENT",
-  "INDIVIDUAL",
-  "PRIVATE",
-  "ORGANIZATION",
-  "NGO",
-  "INTERNATIONAL",
+const SOURCES = [
+  "WEBSITE",
+  "REFERRAL",
+  "COLD_CALL",
+  "SOCIAL_MEDIA",
+  "EVENT",
+  "PARTNER",
 ] as const;
 
-export default function CustomerCreateForm() {
-  const [state, formAction, pending] = useActionState(
-    createCustomerAction,
-    initial,
-  );
+export default function LeadCreateForm() {
+  const [state, formAction, pending] = useActionState(createLeadAction, initial);
 
   return (
     <Form action={formAction}>
       {!state.ok && state.message ? <ErrorBox>{state.message}</ErrorBox> : null}
-
       <Grid>
         <Field>
-          <label htmlFor="customerName">Contact name *</label>
-          <input id="customerName" name="customerName" required />
+          <label htmlFor="firstName">First name *</label>
+          <input id="firstName" name="firstName" required />
         </Field>
         <Field>
-          <label htmlFor="organizationName">Organization *</label>
-          <input id="organizationName" name="organizationName" required />
+          <label htmlFor="lastName">Last name *</label>
+          <input id="lastName" name="lastName" required />
         </Field>
         <Field>
-          <label htmlFor="customerType">Customer type *</label>
-          <select id="customerType" name="customerType" required defaultValue="ORGANIZATION">
-            {CUSTOMER_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
+          <label htmlFor="company">Organization</label>
+          <input id="company" name="company" />
+        </Field>
+        <Field>
+          <label htmlFor="jobTitle">Job title</label>
+          <input id="jobTitle" name="jobTitle" />
+        </Field>
+        <Field>
+          <label htmlFor="email">Email</label>
+          <input id="email" name="email" type="email" />
+        </Field>
+        <Field>
+          <label htmlFor="phone">Phone</label>
+          <input id="phone" name="phone" />
+        </Field>
+        <Field>
+          <label htmlFor="source">Source</label>
+          <select id="source" name="source" defaultValue="WEBSITE">
+            {SOURCES.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
           </select>
         </Field>
         <Field>
-          <label htmlFor="email">Email *</label>
-          <input id="email" name="email" type="email" required />
-        </Field>
-        <Field>
-          <label htmlFor="phone">Phone *</label>
-          <input id="phone" name="phone" required />
-        </Field>
-        <Field>
           <label htmlFor="industry">Industry</label>
           <input id="industry" name="industry" />
         </Field>
-        <Field $span2>
-          <label htmlFor="address">Address</label>
-          <input id="address" name="address" />
+        <Field>
+          <label htmlFor="assignedTo">Assigned to</label>
+          <input id="assignedTo" name="assignedTo" placeholder="username" />
         </Field>
         <Field>
-          <label htmlFor="city">City</label>
-          <input id="city" name="city" />
-        </Field>
-        <Field>
-          <label htmlFor="country">Country</label>
-          <input id="country" name="country" />
-        </Field>
-        <Field>
-          <label htmlFor="postalCode">Postal code</label>
-          <input id="postalCode" name="postalCode" />
-        </Field>
-        <Field>
-          <label htmlFor="website">Website</label>
-          <input id="website" name="website" />
+          <label htmlFor="sourceDetails">Source details</label>
+          <input id="sourceDetails" name="sourceDetails" />
         </Field>
         <Field $span2>
-          <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" rows={3} />
+          <label htmlFor="notes">Notes</label>
+          <textarea id="notes" name="notes" rows={3} />
         </Field>
       </Grid>
-
       <Actions>
-        <Cancel href="/crm/customers">Cancel</Cancel>
+        <Cancel href="/crm/leads">Cancel</Cancel>
         <Submit type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Create customer"}
+          {pending ? "Saving…" : "Create lead"}
         </Submit>
       </Actions>
     </Form>
@@ -179,14 +170,10 @@ const Submit = styled.button`
     opacity: 0.65;
     cursor: wait;
   }
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.05);
-  }
 `;
 
 const ErrorBox = styled.div`
-  background: #fdeaea;
+  background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
   border-radius: 8px;

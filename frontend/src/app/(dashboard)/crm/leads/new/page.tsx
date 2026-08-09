@@ -1,13 +1,13 @@
 import Link from "next/link";
-import CustomerCreateForm from "@/features/crm/components/CustomerCreateForm";
+import LeadCreateForm from "@/features/crm/components/LeadCreateForm";
 import CrmModuleHeader from "@/features/crm/components/CrmModuleHeader";
 
-export default function NewCustomerPage() {
+export default function NewLeadPage() {
   return (
     <div>
-      <CrmModuleHeader section="New Customer" />
+      <CrmModuleHeader section="New Lead" />
       <Link
-        href="/crm/customers"
+        href="/crm/leads"
         style={{
           color: "#64748b",
           fontSize: "0.85rem",
@@ -16,9 +16,9 @@ export default function NewCustomerPage() {
           marginBottom: "0.9rem",
         }}
       >
-        ← Back to customers
+        ← Back to leads
       </Link>
-      <CustomerCreateForm />
+      <LeadCreateForm />
     </div>
   );
 }

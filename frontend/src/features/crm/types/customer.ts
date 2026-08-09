@@ -27,6 +27,8 @@ export type Customer = {
   postalCode: string | null;
   industry: string | null;
   status: CustomerStatus;
+  creditLimit: number | null;
+  currentBalance: number | null;
   territoryId: number | null;
   createdAt: string | null;
   updatedAt: string | null;
