@@ -14,58 +14,39 @@
   "roles": {
     "realm": [
       { "name": "admin", "description": "Full ERP administrator" },
-      { "name": "hrm_user", "description": "HRM module access" },
 
       {
         "name": "hrm_admin",
-        "description": "HR Admin - full HRM administration",
-        "composite": true,
-        "composites": { "realm": ["hrm_user"] }
+        "description": "HR Admin - full HRM administration"
       },
       {
         "name": "hrm_employee",
-        "description": "Employee - HRM self-service access",
-        "composite": true,
-        "composites": { "realm": ["hrm_user"] }
+        "description": "Employee - HRM self-service access"
       },
       {
         "name": "hrm_operations_manager",
-        "description": "HR Operations Manager",
-        "composite": true,
-        "composites": { "realm": ["hrm_user"] }
+        "description": "HR Operations Manager"
       },
       {
         "name": "hrm_recruitment_officer",
-        "description": "Recruitment Officer",
-        "composite": true,
-        "composites": { "realm": ["hrm_user"] }
+        "description": "Recruitment Officer"
       },
       {
         "name": "hrm_department_manager",
-        "description": "Department Manager",
-        "composite": true,
-        "composites": { "realm": ["hrm_user"] }
+        "description": "Department Manager"
       },
-
-      { "name": "prms_user", "description": "PRMS module access" },
 
       {
         "name": "prms_procurement_admin",
-        "description": "Procurement Admin - full PRMS administration",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
+        "description": "Procurement Admin - full PRMS administration"
       },
       {
         "name": "prms_requester",
-        "description": "Requester (Employee) - creates purchase requests",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
+        "description": "Requester (Employee) - creates purchase requests"
       },
       {
         "name": "prms_supplier",
-        "description": "Supplier - external supplier-facing access",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
+        "description": "Supplier - external supplier-facing access"
       },
 
       { "name": "mms_user", "description": "MMS module access - read basic MMS information" },
@@ -89,71 +70,46 @@
         "composites": { "realm": ["mms_user"] }
       },
 
-      { "name": "crm_user", "description": "CRM module access" },
-
-
       {
         "name": "crm_admin",
-        "description": "System Administrator (RADMIN) - full CRM administration",
-        "composite": true,
-        "composites": { "realm": ["crm_user"] }
+        "description": "System Administrator (RADMIN) - full CRM administration"
       },
       {
         "name": "crm_sales_manager",
-        "description": "Sales Manager - oversees the sales pipeline and approvals",
-        "composite": true,
-        "composites": { "realm": ["crm_user"] }
+        "description": "Sales Manager - oversees the sales pipeline and approvals"
       },
       {
         "name": "crm_sales_officer",
-        "description": "Sales Officer - daily leads, quotations and sales orders",
-        "composite": true,
-        "composites": { "realm": ["crm_user"] }
+        "description": "Sales Officer - daily leads, quotations and sales orders"
       },
       {
         "name": "crm_finance_officer",
-        "description": "Finance Officer - customer credit, invoicing and collections",
-        "composite": true,
-        "composites": { "realm": ["crm_user"] }
+        "description": "Finance Officer - customer credit, invoicing and collections"
       },
       {
         "name": "crm_auditor",
-        "description": "Auditor - read-only access for review and audit",
-        "composite": true,
-        "composites": { "realm": ["crm_user"] }
+        "description": "Auditor - read-only access for review and audit"
       },
-
-      { "name": "fms_user", "description": "FMS module access" },
 
       {
         "name": "fms_finance_administrator",
-        "description": "Finance Administrator - full FMS administration",
-        "composite": true,
-        "composites": { "realm": ["fms_user"] }
+        "description": "Finance Administrator - full FMS administration"
       },
       {
         "name": "fms_finance_manager",
-        "description": "Finance Manager - approves and oversees financial operations",
-        "composite": true,
-        "composites": { "realm": ["fms_user"] }
+        "description": "Finance Manager - approves and oversees financial operations"
       },
       {
         "name": "fms_general_accountant",
-        "description": "General Accountant - journals, ledger and period close",
-        "composite": true,
-        "composites": { "realm": ["fms_user"] }
+        "description": "General Accountant - journals, ledger and period close"
       },
       {
         "name": "fms_ap_officer",
-        "description": "Accounts Payable Officer - supplier invoices and payments",
-        "composite": true,
-        "composites": { "realm": ["fms_user"] }
+        "description": "Accounts Payable Officer - supplier invoices and payments"
       },
       {
         "name": "fms_ar_officer",
-        "description": "Accounts Receivable Officer - customer invoices and receipts",
-        "composite": true,
-        "composites": { "realm": ["fms_user"] }
+        "description": "Accounts Receivable Officer - customer invoices and receipts"
       }
     ]
   },
@@ -206,7 +162,7 @@
       "credentials": [
         { "type": "password", "value": "change-me", "temporary": true }
       ],
-      "realmRoles": ["admin", "hrm_user", "prms_user", "mms_user", "crm_user", "fms_user"]
+      "realmRoles": ["admin", "mms_user"]
     }
   ]
 }
