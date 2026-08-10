@@ -50,14 +50,8 @@
       { "name": "prms_user", "description": "PRMS module access" },
 
       {
-        "name": "prms_procurement_manager",
-        "description": "Procurement Manager - full procurement access",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
-      },
-      {
-        "name": "prms_procurement_officer",
-        "description": "Procurement Officer - daily procurement operations",
+        "name": "prms_procurement_admin",
+        "description": "Procurement Admin - full PRMS administration",
         "composite": true,
         "composites": { "realm": ["prms_user"] }
       },
@@ -68,41 +62,29 @@
         "composites": { "realm": ["prms_user"] }
       },
       {
-        "name": "prms_approver",
-        "description": "Approver - approves/rejects purchase requests",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
-      },
-      {
         "name": "prms_supplier",
         "description": "Supplier - external supplier-facing access",
         "composite": true,
         "composites": { "realm": ["prms_user"] }
       },
-      {
-        "name": "prms_receiving_officer",
-        "description": "Receiving Officer - goods receipt and inspection",
-        "composite": true,
-        "composites": { "realm": ["prms_user"] }
-      },
 
-      { "name": "mms_user", "description": "MMS module access" },
+      { "name": "mms_user", "description": "MMS module access - read basic MMS information" },
 
       {
         "name": "mms_inventory_manager",
-        "description": "Inventory Manager - full MMS operational control (read, create, edit, adjust, approve/issue, export)",
+        "description": "Inventory Manager - read, create, update, approve, export",
         "composite": true,
         "composites": { "realm": ["mms_user"] }
       },
       {
         "name": "mms_store_keeper",
-        "description": "Store Keeper - daily warehouse operations (read, create, receive, adjust, export)",
+        "description": "Store Keeper - read, create, update, export",
         "composite": true,
         "composites": { "realm": ["mms_user"] }
       },
       {
         "name": "mms_viewer",
-        "description": "Viewer - read-only access (dashboards, inventory, movements, reports)",
+        "description": "Viewer - read only",
         "composite": true,
         "composites": { "realm": ["mms_user"] }
       },
