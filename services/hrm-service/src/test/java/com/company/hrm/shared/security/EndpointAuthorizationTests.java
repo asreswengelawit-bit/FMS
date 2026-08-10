@@ -38,15 +38,28 @@ class EndpointAuthorizationTests extends PostgresTestBase {
     }
 
     @Test
-    void allowsAnyHrmUserToRead() throws Exception {
-        mockMvc.perform(get("/api/v1/employees").with(jwt().authorities(authority("hrm_user"))))
+    void allowsAnyHrmScopedRoleToRead() throws Exception {
+        mockMvc.perform(get("/api/v1/employees").with(jwt().authorities(authority("hrm_employee"))))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void refusesAWriteFromAPlainHrmUser() throws Exception {
+    void allowsAFineGrainedHrmPermissionToRead() throws Exception {
+        mockMvc.perform(get("/api/v1/employees").with(jwt().authorities(authority("hrm.employee.read"))))
+                .andExpect(status().isOk());
+    }
+
+    /** Module access is scoped by prefix, so another module's role must not open HRM. */
+    @Test
+    void refusesAReadFromAnotherModulesRole() throws Exception {
+        mockMvc.perform(get("/api/v1/employees").with(jwt().authorities(authority("crm_admin"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void refusesAWriteFromAReadOnlyHrmRole() throws Exception {
         mockMvc.perform(post("/api/v1/departments")
-                .with(jwt().authorities(authority("hrm_user")))
+                .with(jwt().authorities(authority("hrm_employee")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         { "name": "Should not be created" }"""))
@@ -56,7 +69,7 @@ class EndpointAuthorizationTests extends PostgresTestBase {
     @Test
     void acceptsAWriteFromTheOwningRole() throws Exception {
         mockMvc.perform(post("/api/v1/departments")
-                .with(jwt().authorities(authority("hrm_user"), authority("hrm_admin")))
+                .with(jwt().authorities(authority("hrm_admin")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         { "name": "Finance" }"""))
@@ -66,7 +79,7 @@ class EndpointAuthorizationTests extends PostgresTestBase {
     @Test
     void acceptsAWriteFromTheFineGrainedPermission() throws Exception {
         mockMvc.perform(post("/api/v1/departments")
-                .with(jwt().authorities(authority("hrm_user"), authority("hrm.department.create")))
+                .with(jwt().authorities(authority("hrm.department.create")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         { "name": "Procurement liaison" }"""))

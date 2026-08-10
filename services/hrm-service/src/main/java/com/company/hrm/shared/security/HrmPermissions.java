@@ -9,15 +9,18 @@ package com.company.hrm.shared.security;
  * (keycloak/realm-export.json), so the fine-grained names are forward-compatible: create
  * them as realm roles and they start working with no code change.
  *
- * <p>Reads only require module access — {@code hrm_user}, which every {@code hrm_*}
- * composite role grants.
+ * <p>Reads only require module access, which any HRM-scoped authority conveys —
+ * a job role ({@code hrm_admin}, {@code hrm_employee}, …) or a fine-grained permission
+ * ({@code hrm.employee.read}). There is deliberately no separate {@code hrm_user} gate
+ * role: the module prefix already identifies the module, so one assignment is enough.
  *
  * <p>All values are compile-time constants so they can be used in annotations.
  */
 public final class HrmPermissions {
 
-    /** Any authenticated HRM user. */
-    public static final String READ = "hasAnyAuthority('hrm_user','admin')";
+    /** Any caller holding an HRM-scoped authority, plus the global administrator. */
+    public static final String READ = "hasAuthority('admin')"
+            + " or authentication.authorities.?[authority.startsWith('hrm')].size() > 0";
 
     private static final String ADMINS = "'hrm_admin','admin'";
     private static final String OPS = "'hrm_operations_manager'," + ADMINS;
