@@ -61,12 +61,17 @@ Every endpoint is under `/api/v1` and returns the shared envelope
 
 ## Permissions
 
-Reads need `hrm_user` (every `hrm_*` composite role grants it). Writes need the
-fine-grained permission `hrm.<entity>.<action>` **or** the realm role that owns the area —
-`hrm_admin`, `hrm_operations_manager`, `hrm_recruitment_officer`. All of it lives in one
-place: [`shared/security/HrmPermissions`](src/main/java/com/company/hrm/shared/security/HrmPermissions.java).
+Reads need any HRM-scoped authority — a job role (`hrm_admin`, `hrm_employee`, …) or a
+fine-grained permission (`hrm.employee.read`). There is no separate `hrm_user` gate role:
+the `hrm` prefix already identifies the module, so one assignment both names the job and
+opens the module. A role from another module (`crm_admin`) does not grant HRM access.
 
-The realm currently ships only the coarse roles
+Writes need the fine-grained permission `hrm.<entity>.<action>` **or** the realm role that
+owns the area — `hrm_admin`, `hrm_operations_manager`, `hrm_recruitment_officer`. All of it
+lives in one place:
+[`shared/security/HrmPermissions`](src/main/java/com/company/hrm/shared/security/HrmPermissions.java).
+
+The realm currently ships only the coarse job roles
 ([`keycloak/realm-export.json`](../../keycloak/realm-export.json)); create the
 `hrm.<entity>.<action>` realm roles when you want finer grants and they start working with
 no code change.
