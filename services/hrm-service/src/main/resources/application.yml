@@ -22,11 +22,18 @@ spring:
       - optional:file:../../.env[.properties]
 
   datasource:
+    url: ${DATABASE_URL}
+    password: ${DATABASE_PASSWORD}
+    username: ${DATABASE_USERNAME}
     # Left unset on purpose: DATABASE_URL wins, and SPRING_DATASOURCE_URL still
     # overrides everything when a developer needs a one-off database.
     hikari:
       pool-name: hrm-pool
       maximum-pool-size: ${HRM_DB_POOL_SIZE:10}
+      max-lifetime: 240000       # 4 minutes (retires connection before Neon drops it)
+      idle-timeout: 120000       # 2 minutes
+      keepalive-time: 30000      # 30 seconds (sends heartbeat ping to keep connection alive)
+      validation-timeout: 3000   # 3 seconds
 
   jpa:
     open-in-view: false
