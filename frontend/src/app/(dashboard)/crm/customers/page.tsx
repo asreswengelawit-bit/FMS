@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { listCustomers } from "@/features/crm/api/customers";
 import { CrmApiError, crmBaseUrl } from "@/features/crm/api/crm-client";
 import { loadCrmOverview } from "@/features/crm/api/overview";
@@ -6,7 +7,9 @@ import CrmKpiRow from "@/features/crm/components/CrmKpiRow";
 import CrmModuleHeader from "@/features/crm/components/CrmModuleHeader";
 import CrmPipeline from "@/features/crm/components/CrmPipeline";
 import CustomersCards from "@/features/crm/components/CustomersCards";
-import { theme } from "@/styles/theme";
+import { AlertBanner } from "@/features/shared/components";
+import { Button } from "@/features/shared/components/ui/button";
+import { Input } from "@/features/shared/components/ui/input";
 
 export default async function CustomersPage({
   searchParams,
@@ -37,28 +40,15 @@ export default async function CustomersPage({
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <CrmModuleHeader
         section="Customers"
         action={
-          <Link
-            href="/crm/customers/new"
-            style={{
-              background: `linear-gradient(180deg, ${theme.red2}, ${theme.red})`,
-              color: "#fff",
-              width: 42,
-              height: 42,
-              borderRadius: 10,
-              display: "grid",
-              placeItems: "center",
-              fontWeight: 800,
-              fontSize: "1.35rem",
-              lineHeight: 1,
-            }}
-            aria-label="Add customer"
-          >
-            +
-          </Link>
+          <Button asChild size="icon" aria-label="Add customer">
+            <Link href="/crm/customers/new">
+              <Plus />
+            </Link>
+          </Button>
         }
       />
 
@@ -69,35 +59,23 @@ export default async function CustomersPage({
         </>
       ) : null}
 
-      <form method="get" style={{ marginBottom: "0.9rem" }}>
-        <input
+      <form method="get" className="flex flex-wrap items-center gap-2">
+        <Input
           name="q"
           defaultValue={q ?? ""}
           placeholder="Search customers..."
-          style={{
-            width: "min(420px, 100%)",
-            border: "1px solid #e2e6ee",
-            background: "#fff",
-            borderRadius: 8,
-            padding: "0.6rem 0.85rem",
-            fontSize: "0.92rem",
-          }}
+          className="max-w-md flex-1"
         />
+        <Button type="submit" variant="outline">
+          Search
+        </Button>
       </form>
 
       {error ? (
-        <div
-          style={{
-            background: "#fff7ed",
-            border: "1px solid #fed7aa",
-            color: "#9a3412",
-            borderRadius: 12,
-            padding: "1rem 1.1rem",
-          }}
-        >
-          <strong>Could not load customers.</strong>
-          <div style={{ marginTop: 6 }}>{error}</div>
-        </div>
+        <AlertBanner
+          type="warning"
+          message={`Could not load customers. ${error}`}
+        />
       ) : (
         <CustomersCards customers={customers} />
       )}

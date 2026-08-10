@@ -1,13 +1,12 @@
 "use client";
 
 import { useTransition } from "react";
-import styled from "styled-components";
 import {
   convertLeadAction,
   qualifyLeadAction,
 } from "@/features/crm/actions/leads";
+import { Button } from "@/features/shared/components/ui/button";
 import type { Lead } from "@/features/crm/types/lead";
-import { theme } from "@/styles/theme";
 
 export default function LeadDetailActions({ lead }: { lead: Lead }) {
   const [pending, start] = useTransition();
@@ -17,10 +16,11 @@ export default function LeadDetailActions({ lead }: { lead: Lead }) {
     lead.status !== "UNQUALIFIED";
 
   return (
-    <Wrap>
+    <div className="flex items-center gap-2">
       {(lead.status === "NEW" || lead.status === "CONTACTED") && (
-        <Ghost
+        <Button
           type="button"
+          variant="outline"
           disabled={pending}
           onClick={() =>
             start(async () => {
@@ -29,10 +29,10 @@ export default function LeadDetailActions({ lead }: { lead: Lead }) {
           }
         >
           Qualify
-        </Ghost>
+        </Button>
       )}
       {canConvert ? (
-        <Primary
+        <Button
           type="button"
           disabled={pending}
           onClick={() =>
@@ -42,45 +42,8 @@ export default function LeadDetailActions({ lead }: { lead: Lead }) {
           }
         >
           Convert to customer
-        </Primary>
+        </Button>
       ) : null}
-    </Wrap>
+    </div>
   );
 }
-
-const Wrap = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const Primary = styled.button`
-  border: none;
-  background: linear-gradient(180deg, ${theme.red2}, ${theme.red});
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: wait;
-  }
-`;
-
-const Ghost = styled.button`
-  border: 1px solid #e2e6ee;
-  background: #fff;
-  color: ${theme.navy};
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: wait;
-  }
-`;

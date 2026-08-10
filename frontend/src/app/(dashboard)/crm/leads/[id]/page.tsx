@@ -3,13 +3,17 @@ import { notFound } from "next/navigation";
 import { CrmApiError } from "@/features/crm/api/crm-client";
 import { getLead } from "@/features/crm/api/leads";
 import CrmModuleHeader from "@/features/crm/components/CrmModuleHeader";
-import LeadStatusBadge from "@/features/crm/components/LeadStatusBadge";
+import LeadDetailActions from "@/features/crm/components/LeadDetailActions";
 import {
   leadDisplayId,
   leadFullName,
 } from "@/features/crm/types/lead";
-import { theme } from "@/styles/theme";
-import LeadDetailActions from "@/features/crm/components/LeadDetailActions";
+import {
+  AlertBanner,
+  SectionCard,
+  StatusBadge,
+} from "@/features/shared/components";
+import { Button } from "@/features/shared/components/ui/button";
 
 export default async function LeadDetailPage({
   params,
@@ -40,93 +44,48 @@ export default async function LeadDetailPage({
     ];
 
     return (
-      <div>
+      <div className="flex flex-col gap-4">
         <CrmModuleHeader section="Lead Detail" />
-        <Link
-          href="/crm/leads"
-          style={{
-            color: "#64748b",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-          }}
-        >
-          ← Back to leads
-        </Link>
+        <Button asChild variant="ghost" className="w-fit px-0">
+          <Link href="/crm/leads">← Back to leads</Link>
+        </Button>
 
-        <div
-          style={{
-            marginTop: "0.75rem",
-            display: "flex",
-            justifyContent: "space-between",
-            gap: "1rem",
-            alignItems: "flex-start",
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <h2
-              style={{
-                margin: 0,
-                color: theme.navy,
-                fontSize: "1.35rem",
-                fontWeight: 800,
-              }}
-            >
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl font-extrabold" style={{ color: "#0B1E3D" }}>
               {lead.company || leadFullName(lead)}
             </h2>
-            <div style={{ marginTop: 8 }}>
-              <LeadStatusBadge status={lead.status} />
-            </div>
+            <StatusBadge status={lead.status} />
           </div>
           <LeadDetailActions lead={lead} />
         </div>
 
-        <div
-          style={{
-            marginTop: "1.1rem",
-            background: "#fff",
-            border: "1px solid #e8ebf1",
-            borderRadius: 12,
-            overflow: "hidden",
-            maxWidth: 760,
-          }}
-        >
-          {rows.map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "180px 1fr",
-                gap: "1rem",
-                padding: "0.85rem 1.1rem",
-                borderBottom: "1px solid #eef1f6",
-                fontSize: "0.92rem",
-              }}
-            >
-              <span style={{ color: "#64748b", fontWeight: 600 }}>{label}</span>
-              <span style={{ color: "#0f172a" }}>{value}</span>
-            </div>
-          ))}
-        </div>
+        <SectionCard title="Details">
+          <div className="flex flex-col">
+            {rows.map(([label, value]) => (
+              <div
+                key={label}
+                className="grid grid-cols-[180px_1fr] gap-4 border-b border-border py-3 text-sm last:border-b-0"
+              >
+                <span className="font-semibold text-muted-foreground">
+                  {label}
+                </span>
+                <span>{value}</span>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
       </div>
     );
   } catch (err) {
     if (err instanceof CrmApiError && err.status === 404) notFound();
     return (
-      <div
-        style={{
-          background: "#fff7ed",
-          border: "1px solid #fed7aa",
-          color: "#9a3412",
-          borderRadius: 12,
-          padding: "1rem 1.1rem",
-        }}
-      >
-        <strong>Could not load lead.</strong>
-        <div style={{ marginTop: 6 }}>
-          {err instanceof Error ? err.message : "Unknown error"}
-        </div>
-      </div>
+      <AlertBanner
+        type="warning"
+        message={`Could not load lead. ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`}
+      />
     );
   }
 }

@@ -2,12 +2,15 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import styled from "styled-components";
 import {
   createLeadAction,
   type LeadActionState,
 } from "@/features/crm/actions/leads";
-import { theme } from "@/styles/theme";
+import { AlertBanner, SectionCard } from "@/features/shared/components";
+import { Button } from "@/features/shared/components/ui/button";
+import { Input } from "@/features/shared/components/ui/input";
+import { Label } from "@/features/shared/components/ui/label";
+import { Textarea } from "@/features/shared/components/ui/textarea";
 
 const initial: LeadActionState = { ok: true };
 
@@ -20,164 +23,86 @@ const SOURCES = [
   "PARTNER",
 ] as const;
 
+const selectClass =
+  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]";
+
 export default function LeadCreateForm() {
   const [state, formAction, pending] = useActionState(createLeadAction, initial);
 
   return (
-    <Form action={formAction}>
-      {!state.ok && state.message ? <ErrorBox>{state.message}</ErrorBox> : null}
-      <Grid>
-        <Field>
-          <label htmlFor="firstName">First name *</label>
-          <input id="firstName" name="firstName" required />
-        </Field>
-        <Field>
-          <label htmlFor="lastName">Last name *</label>
-          <input id="lastName" name="lastName" required />
-        </Field>
-        <Field>
-          <label htmlFor="company">Organization</label>
-          <input id="company" name="company" />
-        </Field>
-        <Field>
-          <label htmlFor="jobTitle">Job title</label>
-          <input id="jobTitle" name="jobTitle" />
-        </Field>
-        <Field>
-          <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" />
-        </Field>
-        <Field>
-          <label htmlFor="phone">Phone</label>
-          <input id="phone" name="phone" />
-        </Field>
-        <Field>
-          <label htmlFor="source">Source</label>
-          <select id="source" name="source" defaultValue="WEBSITE">
-            {SOURCES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field>
-          <label htmlFor="industry">Industry</label>
-          <input id="industry" name="industry" />
-        </Field>
-        <Field>
-          <label htmlFor="assignedTo">Assigned to</label>
-          <input id="assignedTo" name="assignedTo" placeholder="username" />
-        </Field>
-        <Field>
-          <label htmlFor="sourceDetails">Source details</label>
-          <input id="sourceDetails" name="sourceDetails" />
-        </Field>
-        <Field $span2>
-          <label htmlFor="notes">Notes</label>
-          <textarea id="notes" name="notes" rows={3} />
-        </Field>
-      </Grid>
-      <Actions>
-        <Cancel href="/crm/leads">Cancel</Cancel>
-        <Submit type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Create lead"}
-        </Submit>
-      </Actions>
-    </Form>
+    <SectionCard title="New lead">
+      <form action={formAction} className="flex flex-col gap-4">
+        {!state.ok && state.message ? (
+          <AlertBanner type="warning" message={state.message} />
+        ) : null}
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="firstName">First name *</Label>
+            <Input id="firstName" name="firstName" required />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="lastName">Last name *</Label>
+            <Input id="lastName" name="lastName" required />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="company">Organization</Label>
+            <Input id="company" name="company" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="jobTitle">Job title</Label>
+            <Input id="jobTitle" name="jobTitle" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="phone">Phone</Label>
+            <Input id="phone" name="phone" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="source">Source</Label>
+            <select
+              id="source"
+              name="source"
+              defaultValue="WEBSITE"
+              className={selectClass}
+            >
+              {SOURCES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="industry">Industry</Label>
+            <Input id="industry" name="industry" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="assignedTo">Assigned to</Label>
+            <Input id="assignedTo" name="assignedTo" placeholder="username" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="sourceDetails">Source details</Label>
+            <Input id="sourceDetails" name="sourceDetails" />
+          </div>
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea id="notes" name="notes" rows={3} />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button asChild variant="outline">
+            <Link href="/crm/leads">Cancel</Link>
+          </Button>
+          <Button type="submit" disabled={pending}>
+            {pending ? "Saving…" : "Create lead"}
+          </Button>
+        </div>
+      </form>
+    </SectionCard>
   );
 }
-
-const Form = styled.form`
-  background: #fff;
-  border: 1px solid #e8ebf1;
-  border-radius: 12px;
-  padding: 1.25rem 1.4rem 1.4rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-
-  @media (max-width: 720px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Field = styled.div<{ $span2?: boolean }>`
-  grid-column: ${(p) => (p.$span2 ? "1 / -1" : "auto")};
-
-  label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #64748b;
-    margin-bottom: 0.35rem;
-  }
-
-  input,
-  select,
-  textarea {
-    width: 100%;
-    border: 1px solid #e2e6ee;
-    background: #f3f4f6;
-    border-radius: 10px;
-    padding: 0.65rem 0.8rem;
-    font-size: 0.92rem;
-    outline: none;
-  }
-
-  input:focus,
-  select:focus,
-  textarea:focus {
-    border-color: ${theme.red2};
-    background: #fff;
-  }
-`;
-
-const Actions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
-`;
-
-const Cancel = styled(Link)`
-  border: 1px solid #e2e6ee;
-  background: #fff;
-  color: ${theme.navy};
-  padding: 0.55rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-`;
-
-const Submit = styled.button`
-  border: none;
-  background: linear-gradient(180deg, ${theme.red2}, ${theme.red});
-  color: #fff;
-  padding: 0.55rem 1.1rem;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: wait;
-  }
-`;
-
-const ErrorBox = styled.div`
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 0.7rem 0.9rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-`;
