@@ -3,6 +3,7 @@ package com.company.hrm.attendance.controller;
 import com.company.hrm.attendance.dto.ShiftRequest;
 import com.company.hrm.attendance.dto.ShiftResponse;
 import com.company.hrm.attendance.service.ShiftService;
+import com.company.hrm.attendance.service.Impl.ShiftServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 
@@ -24,7 +25,7 @@ import java.util.List;
 @RequestMapping("/api/v1/shifts")
 public class ShiftController {
 
-    private final ShiftService shiftService;
+    private final ShiftServiceImpl shiftService;
 
     @GetMapping
     @PreAuthorize(HrmPermissions.READ)
