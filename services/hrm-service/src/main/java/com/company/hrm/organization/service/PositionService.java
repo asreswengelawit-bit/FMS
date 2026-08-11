@@ -5,6 +5,7 @@ import com.company.hrm.organization.entity.JobGrade;
 import com.company.hrm.organization.entity.Position;
 import com.company.hrm.organization.dto.PositionRequest;
 import com.company.hrm.organization.dto.PositionResponse;
+import com.company.hrm.organization.mapper.OrganizationMapper;
 import com.company.hrm.department.repository.DepartmentRepository;
 import com.company.hrm.organization.repository.JobGradeRepository;
 import com.company.hrm.organization.repository.PositionRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class PositionService {
         private final PositionRepository positionRepository;
         private final DepartmentRepository departmentRepository;
         private final JobGradeRepository jobGradeRepository;
+        private final OrganizationMapper organizationMapper;
 
         public PositionResponse createPosition(PositionRequest requestDto) {
                 Department department = departmentRepository.findById(requestDto.getDepartmentId())
@@ -37,31 +38,33 @@ public class PositionService {
                                                         "JobGrade not found with ID: " + requestDto.getJobGradeId()));
                 }
 
-                Position position = requestDto.toEntity(department, jobGrade);
+                Position position = organizationMapper.toEntity(requestDto);
+                position.setDepartment(department);
+                position.setJobGrade(jobGrade);
                 Position savedPosition = positionRepository.save(position);
 
-                return PositionResponse.fromEntity(savedPosition);
+                return organizationMapper.toResponse(savedPosition);
         }
 
         @Transactional(readOnly = true)
         public PositionResponse getPositionById(Long id) {
                 Position position = positionRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Position not found with ID: " + id));
-                return PositionResponse.fromEntity(position);
+                return organizationMapper.toResponse(position);
         }
 
         @Transactional(readOnly = true)
         public List<PositionResponse> getAllPositions() {
                 return positionRepository.findAll().stream()
-                                .map(PositionResponse::fromEntity)
-                                .collect(Collectors.toList());
+                                .map(organizationMapper::toResponse)
+                                .toList();
         }
 
         @Transactional(readOnly = true)
         public List<PositionResponse> getPositionsByDepartment(Long departmentId) {
                 return positionRepository.findByDepartmentId(departmentId).stream()
-                                .map(PositionResponse::fromEntity)
-                                .collect(Collectors.toList());
+                                .map(organizationMapper::toResponse)
+                                .toList();
         }
 
         public PositionResponse updatePosition(Long id, PositionRequest requestDto) {
@@ -79,17 +82,12 @@ public class PositionService {
                                                         "JobGrade not found with ID: " + requestDto.getJobGradeId()));
                 }
 
+                organizationMapper.updatePosition(requestDto, existingPosition);
                 existingPosition.setDepartment(department);
                 existingPosition.setJobGrade(jobGrade);
-                existingPosition.setTitle(requestDto.getTitle());
-                existingPosition.setCode(requestDto.getCode());
-                existingPosition.setDescription(requestDto.getDescription());
-                existingPosition.setMinSalary(requestDto.getMinSalary());
-                existingPosition.setMaxSalary(requestDto.getMaxSalary());
-                existingPosition.setStatus(requestDto.getStatus());
 
                 Position updatedPosition = positionRepository.save(existingPosition);
-                return PositionResponse.fromEntity(updatedPosition);
+                return organizationMapper.toResponse(updatedPosition);
         }
 
         public void deletePosition(Long id) {
