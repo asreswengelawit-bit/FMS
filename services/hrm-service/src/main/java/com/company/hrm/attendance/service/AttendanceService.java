@@ -11,6 +11,7 @@ import java.util.List;
 import com.company.hrm.attendance.dto.AttendanceRequest;
 import com.company.hrm.attendance.dto.AttendanceResponse;
 import com.company.hrm.attendance.entity.Attendance;
+import com.company.hrm.attendance.mapper.AttendanceMapper;
 import com.company.hrm.attendance.repository.AttendanceRepository;
 import com.company.hrm.employee.entity.Employee;
 import com.company.hrm.employee.repository.EmployeeRepository;
@@ -24,16 +25,18 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final EmployeeRepository employeeRepository;
+    private final AttendanceMapper attendanceMapper;
 
     @Transactional(readOnly = true)
     public List<AttendanceResponse> getAllAttendance() {
-        return attendanceRepository.findAll().stream().map(AttendanceResponse::fromAttendance)
+        return attendanceRepository.findAll().stream()
+                .map(attendanceMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public Optional<AttendanceResponse> getAttendanceById(Long id) {
-        return attendanceRepository.findById(id).map(AttendanceResponse::fromAttendance);
+        return attendanceRepository.findById(id).map(attendanceMapper::toResponse);
     }
 
     public AttendanceResponse addNewAttendance(AttendanceRequest request) {
@@ -47,18 +50,14 @@ public class AttendanceService {
             throw new IllegalStateException("An attendance record already exists for this employee on this date.");
         }
 
-        // 3. Map properties from request directly onto the entity instance
-        Attendance attendance = new Attendance();
+        // 3. Map the request to the entity with MapStruct
+        Attendance attendance = attendanceMapper.toEntity(request);
         attendance.setEmployee(employee);
-        attendance.setDate(request.getDate());
-        attendance.setCheckInTime(request.getCheckInTime());
-        attendance.setCheckOutTime(request.getCheckOutTime());
-        attendance.setStatus(request.getStatus());
 
         // 4. Save to database
         Attendance savedAttendance = attendanceRepository.save(attendance);
 
-        // 5. Convert entity to your exact Response format and return
-        return AttendanceResponse.fromAttendance(savedAttendance);
+        // 5. Convert entity to the response DTO and return
+        return attendanceMapper.toResponse(savedAttendance);
     }
 }
