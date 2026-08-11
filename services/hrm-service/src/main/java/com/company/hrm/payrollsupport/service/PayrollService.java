@@ -1,113 +1,25 @@
 package com.company.hrm.payrollsupport.service;
 
-import com.company.hrm.employee.entity.Employee;
-import com.company.hrm.employee.repository.EmployeeRepository;
 import com.company.hrm.payrollsupport.dto.PayrollRequest;
 import com.company.hrm.payrollsupport.dto.PayrollResponse;
-import com.company.hrm.payrollsupport.entity.Payroll;
 import com.company.hrm.payrollsupport.entity.PayrollStatus;
-import com.company.hrm.payrollsupport.repository.PayrollRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class PayrollService {
+public interface PayrollService {
 
-    private final PayrollRepository payrollRepository;
-    private final EmployeeRepository employeeRepository;
+    PayrollResponse createPayroll(PayrollRequest requestDto);
 
-    public PayrollResponse createPayroll(PayrollRequest requestDto) {
-        Employee employee = employeeRepository.findById(requestDto.getEmployeeId())
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee not found with ID: " + requestDto.getEmployeeId()));
+    PayrollResponse getPayrollById(Long id);
 
-        Payroll payroll = requestDto.toEntity(employee);
-        Payroll savedPayroll = payrollRepository.save(payroll);
+    List<PayrollResponse> getAllPayrolls();
 
-        return PayrollResponse.fromEntity(savedPayroll);
-    }
+    List<PayrollResponse> getPayrollsByEmployee(Long employeeId);
 
-    @Transactional(readOnly = true)
-    public PayrollResponse getPayrollById(Long id) {
-        Payroll payroll = payrollRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Payroll record not found with ID: " + id));
-        return PayrollResponse.fromEntity(payroll);
-    }
+    PayrollResponse updatePayroll(Long id, PayrollRequest requestDto);
 
-    @Transactional(readOnly = true)
-    public List<PayrollResponse> getAllPayrolls() {
-        return payrollRepository.findAll().stream()
-                .map(PayrollResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
+    PayrollResponse updateStatus(Long id, PayrollStatus status, LocalDate paymentDate);
 
-    @Transactional(readOnly = true)
-    public List<PayrollResponse> getPayrollsByEmployee(Long employeeId) {
-        return payrollRepository.findByEmployeeId(employeeId).stream()
-                .map(PayrollResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    public PayrollResponse updatePayroll(Long id, PayrollRequest requestDto) {
-        Payroll existingPayroll = payrollRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Payroll record not found with ID: " + id));
-
-        Employee employee = employeeRepository.findById(requestDto.getEmployeeId())
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee not found with ID: " + requestDto.getEmployeeId()));
-
-        existingPayroll.setEmployee(employee);
-        existingPayroll.setPayPeriodStart(requestDto.getPayPeriodStart());
-        existingPayroll.setPayPeriodEnd(requestDto.getPayPeriodEnd());
-
-        BigDecimal basic = requestDto.getBasicSalary() != null ? requestDto.getBasicSalary() : BigDecimal.ZERO;
-        BigDecimal allowances = requestDto.getAllowances() != null ? requestDto.getAllowances() : BigDecimal.ZERO;
-        BigDecimal deductions = requestDto.getDeductions() != null ? requestDto.getDeductions() : BigDecimal.ZERO;
-
-        existingPayroll.setBasicSalary(basic);
-        existingPayroll.setAllowances(allowances);
-        existingPayroll.setDeductions(deductions);
-
-        // Recalculate net salary
-        existingPayroll.setNetSalary(basic.add(allowances).subtract(deductions));
-
-        if (requestDto.getStatus() != null) {
-            existingPayroll.setStatus(requestDto.getStatus());
-        }
-        existingPayroll.setPaymentDate(requestDto.getPaymentDate());
-
-        Payroll updatedPayroll = payrollRepository.save(existingPayroll);
-        return PayrollResponse.fromEntity(updatedPayroll);
-    }
-
-    public PayrollResponse updateStatus(Long id, PayrollStatus status, LocalDate paymentDate) {
-        Payroll payroll = payrollRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Payroll record not found with ID: " + id));
-
-        payroll.setStatus(status);
-        if (status == PayrollStatus.PAID && paymentDate == null) {
-            payroll.setPaymentDate(LocalDate.now());
-        } else if (paymentDate != null) {
-            payroll.setPaymentDate(paymentDate);
-        }
-
-        Payroll updated = payrollRepository.save(payroll);
-        return PayrollResponse.fromEntity(updated);
-    }
-
-    public void deletePayroll(Long id) {
-        if (!payrollRepository.existsById(id)) {
-            throw new EntityNotFoundException("Payroll record not found with ID: " + id);
-        }
-        payrollRepository.deleteById(id);
-    }
+    void deletePayroll(Long id);
 }

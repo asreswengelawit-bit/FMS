@@ -2,11 +2,13 @@ package com.company.hrm.attendance.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named; // <--- Import Named
 import org.mapstruct.ReportingPolicy;
 
 import com.company.hrm.attendance.dto.AttendanceRequest;
 import com.company.hrm.attendance.dto.AttendanceResponse;
 import com.company.hrm.attendance.entity.Attendance;
+import com.company.hrm.employee.entity.Employee;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AttendanceMapper {
@@ -20,7 +22,8 @@ public interface AttendanceMapper {
     @Mapping(target = "employee", source = "employee", qualifiedByName = "employeeName")
     AttendanceResponse toResponse(Attendance attendance);
 
-    default String employeeName(com.company.hrm.employee.entity.Employee employee) {
+    @Named("employeeName") // <--- Add this annotation so MapStruct can match the qualifier
+    default String employeeName(Employee employee) {
         if (employee == null) {
             return null;
         }
