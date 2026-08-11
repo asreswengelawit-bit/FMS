@@ -57,6 +57,9 @@ public final class HrmPermissions {
 //     public static final String ATTENDANCE_CREATE = "hasAnyAuthority('hrm.attendance.create'," + OPS + ")";
     public static final String ATTENDANCE_UPDATE = "hasAnyAuthority('hrm.attendance.update'," + OPS + ")";
     public static final String ATTENDANCE_DELETE = "hasAnyAuthority('hrm.attendance.delete'," + ADMINS + ")";
+    public static final String SHIFT_CREATE = "hasAnyAuthority('hrm.shift.create'," + OPS + ")";
+    public static final String SHIFT_UPDATE = "hasAnyAuthority('hrm.shift.update'," + OPS + ")";
+    public static final String SHIFT_DELETE = "hasAnyAuthority('hrm.shift.delete'," + ADMINS + ")";
     /** Employees file their own leave, so self-service roles may create. */
     public static final String LEAVE_CREATE = "hasAnyAuthority('hrm.leave.create'," + STAFF + ")";
 
