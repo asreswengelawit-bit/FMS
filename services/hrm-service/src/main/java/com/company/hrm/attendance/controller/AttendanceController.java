@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.company.hrm.attendance.dto.AttendanceRequest;
 import com.company.hrm.attendance.dto.AttendanceResponse;
-import com.company.hrm.attendance.service.AttendanceService;
+// import com.company.hrm.attendance.service.AttendanceService;
+import com.company.hrm.attendance.service.Impl.AttendanceServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/attendance")
 public class AttendanceController {
-    private final AttendanceService attendanceService;
+    private final AttendanceServiceImpl attendanceService;
 
     @GetMapping
     @PreAuthorize(HrmPermissions.READ)

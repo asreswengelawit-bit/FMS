@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.company.hrm.employee.dto.EmployeeRequest;
 import com.company.hrm.employee.dto.EmployeeResponse;
-import com.company.hrm.employee.service.EmployeeService;
+// import com.company.hrm.employee.service.EmployeeService;
+import com.company.hrm.employee.service.Impl.EmployeeServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 
@@ -23,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/v1/employees")
 @Tag(name = "Employees", description = "Employee master data")
 public class EmployeeController {
-    private final EmployeeService employeeService;
+    private final EmployeeServiceImpl employeeService;
 
     // to get all the employees
     @GetMapping

@@ -4,6 +4,8 @@ import com.company.hrm.payrollsupport.dto.PayrollRequest;
 import com.company.hrm.payrollsupport.dto.PayrollResponse;
 import com.company.hrm.payrollsupport.entity.PayrollStatus;
 import com.company.hrm.payrollsupport.service.PayrollService;
+import com.company.hrm.payrollsupport.service.Impl.PayrollServiceImpl;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PayrollController {
 
-    private final PayrollService payrollService;
+    private final PayrollServiceImpl payrollService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.PAYROLL_CREATE)

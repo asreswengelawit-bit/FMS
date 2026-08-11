@@ -3,6 +3,8 @@ package com.company.hrm.organization.controller;
 import com.company.hrm.organization.dto.JobGradeRequest;
 import com.company.hrm.organization.dto.JobGradeResponse;
 import com.company.hrm.organization.service.JobGradeService;
+import com.company.hrm.organization.service.Impl.JobGradeServiceImpl;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobGradeController {
 
-    private final JobGradeService jobGradeService;
+    private final JobGradeServiceImpl jobGradeService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.JOB_GRADE_CREATE)

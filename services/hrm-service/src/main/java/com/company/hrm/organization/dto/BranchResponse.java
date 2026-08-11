@@ -1,6 +1,5 @@
 package com.company.hrm.organization.dto;
 
-import com.company.hrm.organization.entity.Branch;
 import com.company.hrm.organization.entity.Branch.Status;
 import lombok.Builder;
 import lombok.Data;
@@ -23,25 +22,4 @@ public class BranchResponse {
     private boolean isHeadquarters;
     private Status status;
 
-    public static BranchResponse fromEntity(Branch entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        return BranchResponse.builder()
-                .id(entity.getId())
-                .organizationId(entity.getOrganization() != null ? entity.getOrganization().getId() : null)
-                .organizationName(entity.getOrganization() != null ? entity.getOrganization().getName() : null)
-                .name(entity.getName())
-                .code(entity.getCode())
-                .address(entity.getAddress())
-                .city(entity.getCity())
-                .region(entity.getRegion())
-                .country(entity.getCountry())
-                .phone(entity.getPhone())
-                .email(entity.getEmail())
-                .isHeadquarters(entity.isHeadquarters())
-                .status(entity.getStatus())
-                .build();
-    }
 }

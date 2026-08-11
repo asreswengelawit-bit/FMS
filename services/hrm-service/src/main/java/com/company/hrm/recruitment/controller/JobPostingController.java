@@ -3,7 +3,9 @@ package com.company.hrm.recruitment.controller;
 import com.company.hrm.recruitment.entity.JobPosting.Status;
 import com.company.hrm.recruitment.dto.JobPostingRequest;
 import com.company.hrm.recruitment.dto.JobPostingResponse;
-import com.company.hrm.recruitment.service.JobPostingService;
+// import com.company.hrm.recruitment.service.JobPostingService;
+import com.company.hrm.recruitment.service.Impl.JobPostingServiceImpl;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobPostingController {
 
-    private final JobPostingService jobPostingService;
+    private final JobPostingServiceImpl jobPostingService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.JOB_POSTING_CREATE)

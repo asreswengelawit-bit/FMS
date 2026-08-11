@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import com.company.hrm.attendance.entity.Attendance;
 import com.company.hrm.attendance.entity.AttendanceStatus;
 
 import lombok.Data;
@@ -18,21 +17,4 @@ public class AttendanceResponse {
     private LocalTime checkOutTime;
     private AttendanceStatus status;
     private LocalDateTime createdAt;
-
-    public static AttendanceResponse fromAttendance(Attendance attendance) {
-        AttendanceResponse response = new AttendanceResponse();
-        response.setId(attendance.getId());
-        response.setCheckInTime(attendance.getCheckInTime());
-        response.setCheckOutTime(attendance.getCheckOutTime());
-        response.setStatus(attendance.getStatus());
-        response.setDate(attendance.getDate());
-        if (attendance.getEmployee() != null) {
-            response.setEmployee(
-                    attendance.getEmployee().getFirstName() + " " +
-                            attendance.getEmployee().getLastName());
-        }
-        response.setCreatedAt(attendance.getCreatedAt());
-
-        return response;
-    }
 }

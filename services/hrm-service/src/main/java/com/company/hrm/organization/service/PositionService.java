@@ -1,101 +1,21 @@
 package com.company.hrm.organization.service;
 
-import com.company.hrm.department.entity.Department;
-import com.company.hrm.organization.entity.JobGrade;
-import com.company.hrm.organization.entity.Position;
 import com.company.hrm.organization.dto.PositionRequest;
 import com.company.hrm.organization.dto.PositionResponse;
-import com.company.hrm.department.repository.DepartmentRepository;
-import com.company.hrm.organization.repository.JobGradeRepository;
-import com.company.hrm.organization.repository.PositionRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class PositionService {
+public interface PositionService {
 
-        private final PositionRepository positionRepository;
-        private final DepartmentRepository departmentRepository;
-        private final JobGradeRepository jobGradeRepository;
+    PositionResponse createPosition(PositionRequest requestDto);
 
-        public PositionResponse createPosition(PositionRequest requestDto) {
-                Department department = departmentRepository.findById(requestDto.getDepartmentId())
-                                .orElseThrow(() -> new EntityNotFoundException(
-                                                "Department not found with ID: " + requestDto.getDepartmentId()));
+    PositionResponse getPositionById(Long id);
 
-                JobGrade jobGrade = null;
-                if (requestDto.getJobGradeId() != null) {
-                        jobGrade = jobGradeRepository.findById(requestDto.getJobGradeId())
-                                        .orElseThrow(() -> new EntityNotFoundException(
-                                                        "JobGrade not found with ID: " + requestDto.getJobGradeId()));
-                }
+    List<PositionResponse> getAllPositions();
 
-                Position position = requestDto.toEntity(department, jobGrade);
-                Position savedPosition = positionRepository.save(position);
+    List<PositionResponse> getPositionsByDepartment(Long departmentId);
 
-                return PositionResponse.fromEntity(savedPosition);
-        }
+    PositionResponse updatePosition(Long id, PositionRequest requestDto);
 
-        @Transactional(readOnly = true)
-        public PositionResponse getPositionById(Long id) {
-                Position position = positionRepository.findById(id)
-                                .orElseThrow(() -> new EntityNotFoundException("Position not found with ID: " + id));
-                return PositionResponse.fromEntity(position);
-        }
-
-        @Transactional(readOnly = true)
-        public List<PositionResponse> getAllPositions() {
-                return positionRepository.findAll().stream()
-                                .map(PositionResponse::fromEntity)
-                                .collect(Collectors.toList());
-        }
-
-        @Transactional(readOnly = true)
-        public List<PositionResponse> getPositionsByDepartment(Long departmentId) {
-                return positionRepository.findByDepartmentId(departmentId).stream()
-                                .map(PositionResponse::fromEntity)
-                                .collect(Collectors.toList());
-        }
-
-        public PositionResponse updatePosition(Long id, PositionRequest requestDto) {
-                Position existingPosition = positionRepository.findById(id)
-                                .orElseThrow(() -> new EntityNotFoundException("Position not found with ID: " + id));
-
-                Department department = departmentRepository.findById(requestDto.getDepartmentId())
-                                .orElseThrow(() -> new EntityNotFoundException(
-                                                "Department not found with ID: " + requestDto.getDepartmentId()));
-
-                JobGrade jobGrade = null;
-                if (requestDto.getJobGradeId() != null) {
-                        jobGrade = jobGradeRepository.findById(requestDto.getJobGradeId())
-                                        .orElseThrow(() -> new EntityNotFoundException(
-                                                        "JobGrade not found with ID: " + requestDto.getJobGradeId()));
-                }
-
-                existingPosition.setDepartment(department);
-                existingPosition.setJobGrade(jobGrade);
-                existingPosition.setTitle(requestDto.getTitle());
-                existingPosition.setCode(requestDto.getCode());
-                existingPosition.setDescription(requestDto.getDescription());
-                existingPosition.setMinSalary(requestDto.getMinSalary());
-                existingPosition.setMaxSalary(requestDto.getMaxSalary());
-                existingPosition.setStatus(requestDto.getStatus());
-
-                Position updatedPosition = positionRepository.save(existingPosition);
-                return PositionResponse.fromEntity(updatedPosition);
-        }
-
-        public void deletePosition(Long id) {
-                if (!positionRepository.existsById(id)) {
-                        throw new EntityNotFoundException("Position not found with ID: " + id);
-                }
-                positionRepository.deleteById(id);
-        }
+    void deletePosition(Long id);
 }
