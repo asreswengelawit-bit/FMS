@@ -1,4 +1,4 @@
-package package com.company.hrmshared.util;
+package com.company.hrm.shared.util;
 
 import java.util.ArrayList;
 import java.util.List;
