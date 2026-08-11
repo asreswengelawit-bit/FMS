@@ -1,0 +1,27 @@
+name: CRM CI
+
+on:
+  push:
+    paths:
+      - "services/crm-service/**"
+      - ".github/workflows/crm-ci.yml"
+  pull_request:
+    paths:
+      - "services/crm-service/**"
+      - ".github/workflows/crm-ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/crm-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Build
+        run: ./mvnw -B -DskipTests package

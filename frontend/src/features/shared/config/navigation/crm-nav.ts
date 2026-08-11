@@ -3,6 +3,7 @@ export const CRM_NAV = [
   { label: "Leads", path: "/crm/leads" },
   { label: "Quotations", path: "/crm/quotations" },
   { label: "Sales Orders", path: "/crm/sales-orders" },
+  { label: "Invoices", path: "/crm/invoices" },
   { label: "Customers", path: "/crm/customers" },
 ] as const;
 
@@ -11,5 +12,6 @@ export const CRM_TABS = [
   { label: "Leads", path: "/crm/leads" },
   { label: "Quotations", path: "/crm/quotations" },
   { label: "Sales Orders", path: "/crm/sales-orders" },
+  { label: "Invoices", path: "/crm/invoices" },
   { label: "Customers", path: "/crm/customers" },
 ] as const;
