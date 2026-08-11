@@ -2,7 +2,8 @@ package com.company.hrm.department.controller;
 
 import com.company.hrm.department.dto.DepartmentRequest;
 import com.company.hrm.department.dto.DepartmentResponse;
-import com.company.hrm.department.service.DepartmentService;
+// import com.company.hrm.department.service.DepartmentService;
+import com.company.hrm.department.service.Impl.DepartmentServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 
@@ -22,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/departments")
 public class DepartmentController {
-  private final DepartmentService departmentService;
+  private final DepartmentServiceImpl departmentService;
 
   @GetMapping
   @PreAuthorize(HrmPermissions.READ)

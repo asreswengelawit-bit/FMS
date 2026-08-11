@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.company.hrm.organization.dto.BranchRequest;
 import com.company.hrm.organization.dto.BranchResponse;
-import com.company.hrm.organization.service.BranchService;
+// import com.company.hrm.organization.service.BranchService;
+import com.company.hrm.organization.service.Impl.BranchServiceImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.company.hrm.shared.api.ApiResponse;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BranchController {
 
-    private final BranchService branchService;
+    private final BranchServiceImpl branchService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.BRANCH_CREATE)

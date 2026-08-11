@@ -2,7 +2,9 @@ package com.company.hrm.organization.controller;
 
 import com.company.hrm.organization.dto.OrganizationRequest;
 import com.company.hrm.organization.dto.OrganizationResponse;
-import com.company.hrm.organization.service.OrganizationService;
+// import com.company.hrm.organization.service.OrganizationService;
+import com.company.hrm.organization.service.Impl.OrganizationServiceImpl;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrganizationController {
 
-    private final OrganizationService organizationService;
+    private final OrganizationServiceImpl organizationService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.ORGANIZATION_CREATE)

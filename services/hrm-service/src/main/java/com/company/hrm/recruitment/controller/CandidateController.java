@@ -2,7 +2,9 @@ package com.company.hrm.recruitment.controller;
 
 import com.company.hrm.recruitment.dto.CandidateRequest;
 import com.company.hrm.recruitment.dto.CandidateResponse;
-import com.company.hrm.recruitment.service.CandidateService;
+// import com.company.hrm.recruitment.service.CandidateService;
+import com.company.hrm.recruitment.service.Impl.CandidateServiceImpl;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CandidateController {
 
-    private final CandidateService candidateService;
+    private final CandidateServiceImpl candidateService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.CANDIDATE_CREATE)

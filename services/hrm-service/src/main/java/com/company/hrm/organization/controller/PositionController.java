@@ -2,7 +2,8 @@ package com.company.hrm.organization.controller;
 
 import com.company.hrm.organization.dto.PositionRequest;
 import com.company.hrm.organization.dto.PositionResponse;
-import com.company.hrm.organization.service.PositionService;
+// import com.company.hrm.organization.service.PositionService;
+import com.company.hrm.organization.service.Impl.PositionServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PositionController {
 
-    private final PositionService positionService;
+    private final PositionServiceImpl positionService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.POSITION_CREATE)
