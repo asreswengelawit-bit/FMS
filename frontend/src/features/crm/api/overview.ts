@@ -1,4 +1,5 @@
 import { listCustomers } from "@/features/crm/api/customers";
+import { listInvoices } from "@/features/crm/api/invoices";
 import { listLeads } from "@/features/crm/api/leads";
 import { listQuotations } from "@/features/crm/api/quotations";
 import { listSalesOrders } from "@/features/crm/api/sales-orders";
@@ -15,6 +16,7 @@ export type CrmOverview = {
   activeCustomerTotal: number;
   openQuotations: number;
   draftOrders: number;
+  openInvoices: number;
 };
 
 function countByStatus(leads: Lead[], status: LeadStatus): number {
@@ -28,6 +30,7 @@ export async function loadCrmOverview(q?: string): Promise<CrmOverview> {
   let activeCustomerTotal = 0;
   let openQuotations = 0;
   let draftOrders = 0;
+  let openInvoices = 0;
 
   try {
     const leadPage = await listLeads({ q, page: 0, size: 100 });
@@ -63,6 +66,19 @@ export async function loadCrmOverview(q?: string): Promise<CrmOverview> {
     ).length;
   } catch {
     draftOrders = 0;
+  }
+
+  try {
+    const invoices = await listInvoices({ page: 0, size: 100 });
+    openInvoices = invoices.content.filter(
+      (x) =>
+        x.status === "DRAFT" ||
+        x.status === "PENDING" ||
+        x.status === "SENT" ||
+        x.status === "OVERDUE",
+    ).length;
+  } catch {
+    openInvoices = 0;
   }
 
   const activeLeads = leads.filter(
@@ -102,10 +118,10 @@ export async function loadCrmOverview(q?: string): Promise<CrmOverview> {
       iconTone: "green",
     },
     {
-      label: "Qualified",
-      value: String(countByStatus(leads, "QUALIFIED")),
-      hint: "Ready to convert",
-      hintTone: "blue",
+      label: "Open Invoices",
+      value: String(openInvoices),
+      hint: "Unpaid / outstanding",
+      hintTone: "red",
       iconTone: "violet",
     },
     {
@@ -155,5 +171,6 @@ export async function loadCrmOverview(q?: string): Promise<CrmOverview> {
     activeCustomerTotal,
     openQuotations,
     draftOrders,
+    openInvoices,
   };
 }

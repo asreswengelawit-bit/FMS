@@ -57,6 +57,8 @@ const statusMap: Record<string, { color: string; bg: string }> = {
   CANCELLED:        { color: "#64748B", bg: "#F1F5F9" },
   PROCESSING:       { color: "#2563EB", bg: "#EEF2FF" },
   COMPLETED:        { color: "#16A34A", bg: "#F0FDF4" },
+  PAID:             { color: "#16A34A", bg: "#F0FDF4" },
+  OVERDUE:          { color: "#C8102E", bg: "#FFF1F3" },
   // FMS
   Posted:           { color: "#16A34A", bg: "#F0FDF4" },
   "Partially Paid": { color: "#D97706", bg: "#FFFBEB" },
