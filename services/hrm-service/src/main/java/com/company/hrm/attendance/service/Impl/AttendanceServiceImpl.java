@@ -63,4 +63,39 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 5. Convert entity to the response DTO and return
         return attendanceMapper.toResponse(savedAttendance);
     }
+
+    @Override
+    public AttendanceResponse updateAttendance(Long id, AttendanceRequest request) {
+        // 1. Fetch existing attendance record
+        Attendance existingAttendance = attendanceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Attendance record not found with id: " + id));
+
+        // 2. Verify that the employee exists
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + request.getEmployeeId()));
+
+        // 3. Ensure no duplicate record exists for the same employee and date (excluding the current record)
+        attendanceRepository.findByEmployeeIdAndDate(request.getEmployeeId(), request.getDate())
+                .ifPresent(duplicate -> {
+                    if (!duplicate.getId().equals(id)) {
+                        throw new IllegalStateException("An attendance record already exists for this employee on this date.");
+                    }
+                });
+
+        // 4. Update fields via mapper and set entity relationships
+        attendanceMapper.updateEntityFromDto(request, existingAttendance);
+        existingAttendance.setEmployee(employee);
+
+        // 5. Save and return updated DTO
+        Attendance updatedAttendance = attendanceRepository.save(existingAttendance);
+        return attendanceMapper.toResponse(updatedAttendance);
+    }
+
+    @Override
+    public void deleteAttendance(Long id) {
+        if (!attendanceRepository.existsById(id)) {
+            throw new EntityNotFoundException("Attendance record not found with id: " + id);
+        }
+        attendanceRepository.deleteById(id);
+    }
 }

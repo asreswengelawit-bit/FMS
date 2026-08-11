@@ -13,4 +13,6 @@ public interface AttendanceService {
     Optional<AttendanceResponse> getAttendanceById(Long id);
 
     AttendanceResponse addNewAttendance(AttendanceRequest request);
+    void deleteAttendance(Long id);
+    AttendanceResponse updateAttendance(Long id, AttendanceRequest request) ;
 }

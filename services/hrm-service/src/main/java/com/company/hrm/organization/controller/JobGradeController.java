@@ -2,7 +2,7 @@ package com.company.hrm.organization.controller;
 
 import com.company.hrm.organization.dto.JobGradeRequest;
 import com.company.hrm.organization.dto.JobGradeResponse;
-import com.company.hrm.organization.service.JobGradeService;
+// import com.company.hrm.organization.service.JobGradeService;
 import com.company.hrm.organization.service.Impl.JobGradeServiceImpl;
 
 import jakarta.validation.Valid;
@@ -60,3 +60,4 @@ public class JobGradeController {
         return ResponseEntity.ok(ApiResponse.ok(null, "Job grade deleted"));
     }
 }
+
