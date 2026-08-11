@@ -1,6 +1,5 @@
 package com.company.hrm.organization.dto;
 
-import com.company.hrm.organization.entity.Organization;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -27,22 +26,4 @@ public class OrganizationRequest {
     private String logoUrl;
     private LocalDate foundedDate;
 
-    /**
-     * Converts incoming request DTO -> Organization Entity
-     */
-    public Organization toEntity() {
-        return Organization.builder()
-                .name(this.name)
-                .legalName(this.legalName)
-                .registrationNumber(this.registrationNumber)
-                .taxId(this.taxId)
-                .industry(this.industry)
-                .address(this.address)
-                .phone(this.phone)
-                .email(this.email)
-                .website(this.website)
-                .logoUrl(this.logoUrl)
-                .foundedDate(this.foundedDate)
-                .build();
-    }
 }
