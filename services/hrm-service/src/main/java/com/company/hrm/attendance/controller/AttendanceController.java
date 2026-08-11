@@ -20,13 +20,15 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Attendance", description = "Daily attendance records")
-@RestController
+@RestController 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/attendance")
 public class AttendanceController {
@@ -54,4 +56,19 @@ public class AttendanceController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(created, "Attendance recorded"));
     }
+    @PutMapping("/{id}")
+@PreAuthorize(HrmPermissions.ATTENDANCE_UPDATE)
+public ResponseEntity<ApiResponse<AttendanceResponse>> updateAttendance(
+        @PathVariable Long id,
+        @Valid @RequestBody AttendanceRequest request) {
+    AttendanceResponse updated = attendanceService.updateAttendance(id, request);
+    return ResponseEntity.ok(ApiResponse.ok(updated, "Attendance updated"));
+}
+
+@DeleteMapping("/{id}")
+@PreAuthorize(HrmPermissions.ATTENDANCE_DELETE)
+public ResponseEntity<ApiResponse<Void>> deleteAttendance(@PathVariable Long id) {
+    attendanceService.deleteAttendance(id);
+    return ResponseEntity.ok(ApiResponse.ok(null, "Attendance record deleted"));
+}
 }
