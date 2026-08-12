@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+// Tailwind + the Shadcn design tokens. Loaded before the styled-components
+// registry so component-level styles still win over the utility base layer.
+import "./globals.css";
 import StyledComponentsRegistry from "@/styles/registry";
 import { GlobalStyle } from "@/styles/global-style";
 
