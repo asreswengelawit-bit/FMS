@@ -4,6 +4,7 @@
 #   Neon Postgres  -> application business data (Spring services via DATABASE_URL)
 #   keycloak-db    -> Keycloak's OWN internal store (local Postgres container)
 #   keycloak       -> central Identity Provider (OIDC/JWT), imports the `erp` realm
+#   frontend       -> Next.js 15 shared ERP web application (port 3000)
 #
 # Keycloak deliberately does NOT use Neon: its schema bootstrap runs a long
 # migration transaction that Neon terminates (idle-in-transaction / cold start /
@@ -11,10 +12,11 @@
 # holds all ERP business data.
 #
 #   cp .env.example .env      # then fill in real Neon + Keycloak values
-#   docker compose up -d      # starts keycloak-db + keycloak, imports `erp` realm
+#   docker compose up -d      # starts keycloak-db + keycloak + frontend
 #
 # Admin console:  http://localhost:8080/   (login with KC_BOOTSTRAP_ADMIN_*)
 # OIDC issuer:    http://localhost:8080/realms/erp
+# Frontend app:   http://localhost:3000/
 # ============================================================================
 
 services:
@@ -70,6 +72,39 @@ services:
       retries: 20
       start_period: 40s
     restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Shared Frontend Web Application (Next.js 15 App Router)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infrastructure/docker/frontend.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+        KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
+        KEYCLOAK_FRONTEND_CLIENT_ID: ${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
+    container_name: erp-frontend
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
+      - KEYCLOAK_FRONTEND_CLIENT_ID=${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-super-secret-key-change-in-production}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    depends_on:
+      keycloak:
+        condition: service_healthy
 
 volumes:
   keycloak_pgdata:
