@@ -88,7 +88,11 @@ public final class HrmPermissions {
     public static final String INTERVIEW_CREATE = "hasAnyAuthority('hrm.interview.create'," + RECRUITERS + ")";
     public static final String INTERVIEW_UPDATE = "hasAnyAuthority('hrm.interview.update'," + RECRUITERS + ")";
     public static final String INTERVIEW_DELETE = "hasAnyAuthority('hrm.interview.delete'," + RECRUITERS + ")";
-
+    //separation and clearance 
+    // --- separation & clearance ------------------------------------------------
+    public static final String CLEARANCE_CREATE = "hasAnyAuthority('hrm.clearance.create'," + OPS + ")";
+    public static final String CLEARANCE_UPDATE = "hasAnyAuthority('hrm.clearance.update'," + OPS + ")";
+    public static final String CLEARANCE_DELETE = "hasAnyAuthority('hrm.clearance.delete'," + ADMINS + ")";
     private HrmPermissions() {
     }
 }

@@ -16,8 +16,8 @@ import java.util.List;
 import com.company.hrm.leave.dto.LeaveRequest;
 import com.company.hrm.leave.dto.LeaveResponse;
 import com.company.hrm.leave.entity.LeaveStatus;
-// import com.company.hrm.leave.service.LeaveService;
-import com.company.hrm.leave.service.Impl.LeaveServiceImpl;
+import com.company.hrm.leave.service.LeaveService;
+// import com.company.hrm.leave.service.Impl.LeaveServiceImpl;
 import com.company.hrm.shared.api.ApiResponse;
 import com.company.hrm.shared.security.HrmPermissions;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/leave-requests")
 @RequiredArgsConstructor
 public class LeaveController {
-    final private LeaveServiceImpl leaveService;
+     private final LeaveService leaveService;
 
     @PostMapping
     @PreAuthorize(HrmPermissions.LEAVE_CREATE)

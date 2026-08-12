@@ -10,6 +10,10 @@
 #              silently corrupting the schema.
 # Auth       : OAuth2 resource server against the shared Keycloak `erp` realm.
 # ============================================================================
+hrm:
+  security:
+    enabled: false
+
 spring:
   application:
     name: hrm-service
