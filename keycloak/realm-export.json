@@ -35,6 +35,10 @@
         "name": "hrm_department_manager",
         "description": "Department Manager"
       },
+      {
+        "name": "hrm.service.read",
+        "description": "Service-to-service read access to HRM - satisfies HrmPermissions.READ, grants no writes"
+      },
 
       {
         "name": "prms_procurement_admin",
