@@ -4,11 +4,16 @@
 *.env
 !.env.example
 
-# ---- Java (Maven / Gradle) ----
+# ---- Java / Maven / Gradle ----
 target/
 .gradle/
 build/
+target/
 *.class
+*.jar
+*.war
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 # ---- Node / Next.js ----
 node_modules/
@@ -26,3 +31,9 @@ Thumbs.db
 
 # ---- Logs ----
 *.log
+
+# ---- Local Spring config (service-level secrets) ----
+**/application-local.properties
+**/application-local.yml
+services/**/src/main/resources/application.properties
+!services/**/src/main/resources/application.properties.example

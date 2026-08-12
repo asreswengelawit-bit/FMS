@@ -1,0 +1,25 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: crm-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: crm
+      RABBITMQ_DEFAULT_PASS: crm123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: crm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+volumes:
+  rabbitmq_data:
+  redis_data:
