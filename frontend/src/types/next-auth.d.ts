@@ -6,14 +6,23 @@ declare module "next-auth" {
     roles: string[];
     accessToken?: string;
     idToken?: string;
+    /** Set when the Keycloak refresh token no longer works — force a re-login. */
+    error?: "RefreshTokenError";
     user: DefaultSession["user"];
   }
 }
 
-declare module "next-auth/jwt" {
+// `next-auth/jwt` re-exports this interface from @auth/core, and only the
+// @auth/core declaration is the one the callbacks are typed against.
+declare module "@auth/core/jwt" {
   interface JWT {
     roles?: string[];
     accessToken?: string;
+    /** Buys a new access token once the current one expires. */
+    refreshToken?: string;
     idToken?: string;
+    /** Absolute expiry of `accessToken`, in ms since the epoch. */
+    expiresAt?: number;
+    error?: "RefreshTokenError";
   }
 }
