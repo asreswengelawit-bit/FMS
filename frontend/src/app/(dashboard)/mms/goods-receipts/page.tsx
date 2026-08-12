@@ -1,10 +1,3 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { GoodsReceiptsView } from "@/features/mms/components/mms-views";
 
-export default function Page() {
-  return (
-    <ModuleDashboard
-      title="goods-receipts"
-      description="Welcome to the goods-receipts module overview."
-    />
-  );
-}
+export default function GoodsReceiptsPage() { return <GoodsReceiptsView/>; }

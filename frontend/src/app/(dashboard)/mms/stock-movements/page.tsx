@@ -1,10 +1,3 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { MovementsView } from "@/features/mms/components/mms-views";
 
-export default function Page() {
-  return (
-    <ModuleDashboard
-      title="stock-movements"
-      description="Welcome to the stock-movements module overview."
-    />
-  );
-}
+export default function StockMovementsPage() { return <MovementsView/>; }

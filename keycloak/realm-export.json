@@ -87,6 +87,9 @@
       },
 
       { "name": "mms_user", "description": "MMS module access" },
+      { "name": "inventory_manager", "description": "MMS inventory administration and approvals" },
+      { "name": "store_keeper", "description": "MMS warehouse operations" },
+      { "name": "viewer", "description": "Read-only MMS access" },
       { "name": "crm_user", "description": "CRM module access" },
       { "name": "fms_user", "description": "FMS module access" }
     ]
@@ -117,6 +120,26 @@
       }
     },
     {
+      "clientId": "mms-postman",
+      "name": "MMS Postman",
+      "description": "Public OAuth2 authorization-code client for local MMS API testing with PKCE.",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "https://oauth.pstmn.io/v1/callback"
+      ],
+      "webOrigins": [
+        "https://oauth.pstmn.io"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
       "clientId": "erp-backend",
       "name": "ERP Backend Services",
       "description": "Confidential client for service-to-service calls (client credentials). Spring resource servers only validate JWTs; they do not need a client, but this enables machine-to-machine auth. Regenerate the secret after first import.",
@@ -140,7 +163,7 @@
       "credentials": [
         { "type": "password", "value": "change-me", "temporary": true }
       ],
-      "realmRoles": ["admin", "hrm_user", "prms_user", "mms_user", "crm_user", "fms_user"]
+      "realmRoles": ["admin", "hrm_user", "prms_user", "mms_user", "inventory_manager", "store_keeper", "viewer", "crm_user", "fms_user"]
     }
   ]
 }

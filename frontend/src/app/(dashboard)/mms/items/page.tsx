@@ -1,10 +1,3 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { ItemsView } from "@/features/mms/components/mms-views";
 
-export default function Page() {
-  return (
-    <ModuleDashboard
-      title="items"
-      description="Welcome to the items module overview."
-    />
-  );
-}
+export default function ItemsPage() { return <ItemsView/>; }

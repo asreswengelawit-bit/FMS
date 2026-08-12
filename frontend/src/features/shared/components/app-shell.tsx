@@ -12,8 +12,23 @@ import { CRM_NAV } from "@/features/shared/config/navigation/crm-nav";
 
 const MODULE_TITLE: Record<string, string> = {
   hrm: "Human Resource Management",
+  prms: "Procurement & Resource Management",
+  mms: "Materials Management System (MMS)",
   crm: "Sales & Customer Relationship Management",
+  fms: "Financial Management System",
 };
+
+const MMS_SUBNAV = [
+  { label: "Dashboard", path: "/mms" },
+  { label: "Item Master", path: "/mms/items" },
+  { label: "Inventory", path: "/mms/inventory" },
+  { label: "Warehouses", path: "/mms/warehouses" },
+  { label: "Stock Levels", path: "/mms/stock-levels" },
+  { label: "Stock Movements", path: "/mms/stock-movements" },
+  { label: "Goods Receipts", path: "/mms/goods-receipts" },
+  { label: "Requisitions", path: "/mms/requisitions" },
+  { label: "Reports & Analytics", path: "/mms/reports" },
+];
 
 const p = (label: string) => ({ label, path: "/hrm" });
 const HR_SUBNAV: Record<string, { label: string; path: string }[]> = {
@@ -79,9 +94,12 @@ export default function AppShell({
             const items =
               m.key === "hrm"
                 ? (HR_SUBNAV[hrRole] ?? HR_SUBNAV.hrm_user)
+                : m.key === "mms"
+                ? MMS_SUBNAV
                 : m.key === "crm"
-                  ? [...CRM_NAV]
-                  : [{ label: "Dashboard", path: m.path }];
+                ? [...CRM_NAV]
+                : [{ label: "Dashboard", path: m.path }];
+            const iconName = m.key === "mms" ? "layers" : m.key === "hrm" ? "users" : "grid";
             const isOpen = open === m.key;
             const isActive = active?.key === m.key;
             return (
@@ -90,7 +108,7 @@ export default function AppShell({
                   $active={isActive}
                   onClick={() => setOpen(isOpen ? "" : m.key)}
                 >
-                  <Icon name="users" />
+                  <Icon name={iconName as any} />
                   {!collapsed && (
                     <>
                       <span>{m.label}</span>

@@ -1,10 +1,3 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { MmsOverview } from "@/features/mms/components/mms-views";
 
-export default function MmsPage() {
-  return (
-    <ModuleDashboard
-      title="Materials / Inventory"
-      description="Welcome to the MMS module dashboard."
-    />
-  );
-}
+export default function MmsPage() { return <MmsOverview/>; }
