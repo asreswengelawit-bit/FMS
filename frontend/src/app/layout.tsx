@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import StyledComponentsRegistry from "@/styles/registry";
 import { GlobalStyle } from "@/styles/global-style";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "INSA-ERP",

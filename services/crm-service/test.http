@@ -1,0 +1,298 @@
+### ============================================================
+### CRM E2E sales pipeline — happy path
+### ============================================================
+### Response shape (all CRM APIs):
+###   { "success": true, "message": "...", "data": { ... }, "timestamp": "..." }
+### IDs live under data.id (or data.content[].id for paged lists).
+### Flow + expected statuses:
+###   1. Login                         → JWT
+###   2. Create lead                   → LeadStatus = NEW
+###   3. Qualify lead                  → LeadStatus = QUALIFIED
+###   4. Convert lead                  → LeadStatus = CONVERTED
+###                                    → Customer created
+###                                    → Opportunity stage = NEW
+###   5. Create quotation              → QuotationStatus = DRAFT
+###   6. Send quotation (optional)     → QuotationStatus = SENT
+###   7. Accept quotation              → QuotationStatus = ACCEPTED
+###                                    → SalesOrder status = DRAFT (linked)
+###   8. Confirm sales order           → OrderStatus = APPROVED
+###                                    → publishes sales.order.confirmed (SKU/qty)
+###   9. Create invoice                → InvoiceStatus = DRAFT
+###  10. Record payment (full)         → PaymentStatus = COMPLETED
+###                                    → InvoiceStatus = PAID
+###
+### Replace @leadId / @customerId / @opportunityId / @quotationId /
+### @salesOrderId / @invoiceId with IDs from prior responses.
+### Prefer gateway :8080. Direct CRM :8082 also works with the same paths.
+### ============================================================
+
+@baseUrl = http://localhost:8080
+@crmUrl = http://localhost:8082
+@token = TOKEN
+@leadId = 1
+@customerId = 1
+@opportunityId = 1
+@quotationId = 1
+@salesOrderId = 1
+@invoiceId = 1
+
+### ------------------------------------------------------------
+### 0) Auth — get JWT (Auth Service via Gateway)
+### Expected: 200, data.accessToken + data.refreshToken
+### ------------------------------------------------------------
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Refresh access token
+# @name refresh
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{login.response.body.$.data.refreshToken}}"
+}
+
+### Logout (blacklist access jti + revoke refresh)
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{login.response.body.$.data.refreshToken}}"
+}
+
+### Copy accessToken from login into @token above, or use:
+### Authorization: Bearer {{login.response.body.accessToken}}
+
+### Current user profile
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Soft-delete customer (ADMIN)
+DELETE {{baseUrl}}/api/customers/{{customerId}}
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 1) Create lead
+### Expected: 201, status = NEW
+### ------------------------------------------------------------
+# @name createLead
+POST {{baseUrl}}/api/leads
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "Ada",
+  "lastName": "Lovelace",
+  "email": "ada.lovelace.e2e@crm.local",
+  "phone": "+251911000001",
+  "company": "Analytical Engines PLC",
+  "industry": "Technology",
+  "jobTitle": "CTO",
+  "budget": 150000,
+  "source": "WEBSITE",
+  "notes": "E2E happy-path lead"
+}
+
+### ------------------------------------------------------------
+### 2) Qualify lead
+### Expected: 200, status = QUALIFIED
+### Allowed: NEW → CONTACTED | QUALIFIED | UNQUALIFIED | LOST
+### ------------------------------------------------------------
+# @name qualifyLead
+PATCH {{baseUrl}}/api/leads/{{leadId}}/status?status=QUALIFIED
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 3) Convert lead → customer + opportunity
+### Expected: 200
+###   lead.status = CONVERTED
+###   convertedCustomerId set
+###   convertedOpportunityId set (when createOpportunity=true)
+###   opportunity.stage = NEW
+### Requires: lead must be QUALIFIED (only QUALIFIED → CONVERTED)
+### ------------------------------------------------------------
+# @name convertLead
+PATCH {{baseUrl}}/api/leads/{{leadId}}/convert
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conversionReason": "Budget confirmed, ready to buy",
+  "createOpportunity": true,
+  "opportunityTitle": "Analytical Engines — CRM suite",
+  "opportunityValue": 150000
+}
+
+### ------------------------------------------------------------
+### 3b) Optional — advance opportunity stage
+### Expected: 200, stage = PROPOSAL (example)
+### Stages: NEW → NEEDS_ANALYSIS → QUALIFICATION → PROPOSAL → NEGOTIATION → CLOSED_WON|CLOSED_LOST
+### ------------------------------------------------------------
+PATCH {{baseUrl}}/api/opportunities/{{opportunityId}}/stage?stage=PROPOSAL
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 4) Create quotation (link customer + opportunity from convert)
+### Expected: 201, status = DRAFT
+### ------------------------------------------------------------
+# @name createQuotation
+POST {{baseUrl}}/api/quotations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": {{customerId}},
+  "opportunityId": {{opportunityId}},
+  "issueDate": "2026-08-07",
+  "expiryDate": "2026-09-07",
+  "subtotal": 100000,
+  "discount": 0,
+  "tax": 15000,
+  "totalAmount": 115000,
+  "notes": "E2E quotation",
+  "items": [
+    {
+      "itemName": "CRM License",
+      "sku": "CRM-LIC-001",
+      "description": "Annual seat license",
+      "quantity": 10,
+      "unitPrice": 10000
+    }
+  ]
+}
+
+### ------------------------------------------------------------
+### 5) Send quotation (optional before accept)
+### Expected: 200, status = SENT
+### Allowed from DRAFT: SENT | CANCELLED | ACCEPTED
+### ------------------------------------------------------------
+# @name sendQuotation
+PATCH {{baseUrl}}/api/quotations/{{quotationId}}/status?status=SENT
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 6) Accept quotation → creates linked sales order
+### Expected: 200
+###   quotation.status = ACCEPTED (terminal)
+###   sales order created with status = DRAFT, quotationId linked
+###   response is SalesOrderResponseDTO (use id as @salesOrderId)
+### Allowed accept from: DRAFT | SENT
+### Blocked if quotation already linked to an order
+### ------------------------------------------------------------
+# @name acceptQuotation
+PATCH {{baseUrl}}/api/quotations/{{quotationId}}/accept
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 7) Confirm sales order
+### Expected: 200, status = APPROVED
+### Publishes RabbitMQ sales.order.confirmed with SKU/qty for MMS
+### Allowed: DRAFT → APPROVED (also PENDING → APPROVED)
+### ------------------------------------------------------------
+# @name confirmOrder
+PATCH {{baseUrl}}/api/sales-orders/{{salesOrderId}}/confirm
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------
+### 8) Create invoice from confirmed order
+### Expected: 201
+###   invoice.status = DRAFT
+###   paidAmount = 0, balanceAmount = total
+### Requires: order status APPROVED | PROCESSING | COMPLETED
+### ------------------------------------------------------------
+# @name createInvoice
+POST {{baseUrl}}/api/invoices
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "salesOrderId": {{salesOrderId}},
+  "customerId": {{customerId}},
+  "invoiceDate": "2026-08-07",
+  "dueDate": "2026-08-21",
+  "taxAmount": 15000,
+  "discountAmount": 0,
+  "currency": "ETB",
+  "notes": "E2E invoice"
+}
+
+### ------------------------------------------------------------
+### 9) Record full payment
+### Expected: 201
+###   payment.status = COMPLETED
+###   invoice.paidAmount += amount
+###   invoice.balanceAmount → 0 → invoice.status = PAID
+### (Partial pay: if invoice was DRAFT/SENT and balance > 0 → PENDING)
+### Blocked: amount ≤ 0, amount > balance, cancelled/fully-paid invoice
+### ------------------------------------------------------------
+# @name createPayment
+POST {{baseUrl}}/api/payments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "invoiceId": {{invoiceId}},
+  "customerId": {{customerId}},
+  "paymentMethod": "BANK_TRANSFER",
+  "amount": 115000,
+  "paymentDate": "2026-08-07",
+  "transactionReference": "E2E-TXN-001",
+  "receivedBy": "admin",
+  "notes": "Full settlement"
+}
+
+### ------------------------------------------------------------
+### 10) Verify endpoints (optional)
+### ------------------------------------------------------------
+GET {{baseUrl}}/api/leads/{{leadId}}
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/quotations/{{quotationId}}
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/sales-orders/{{salesOrderId}}
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/invoices/{{invoiceId}}
+Authorization: Bearer {{token}}
+
+### ============================================================
+### Other helpers
+### ============================================================
+
+### Register a sales officer (Auth via Gateway)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "officer1",
+  "email": "officer1@crm.local",
+  "password": "officer123",
+  "role": "SALES_OFFICER"
+}
+
+### List customers
+GET {{baseUrl}}/api/customers
+Authorization: Bearer {{token}}
+
+### Direct Auth Service (bypass gateway)
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Direct CRM health
+GET {{crmUrl}}/actuator/health
