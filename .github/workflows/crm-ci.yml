@@ -24,4 +24,6 @@ jobs:
           java-version: "21"
           cache: maven
       - name: Build
-        run: ./mvnw -B -DskipTests package
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -DskipTests package
