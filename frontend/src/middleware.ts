@@ -36,6 +36,12 @@ export default auth((req) => {
 });
 
 // Run on every route except Auth.js API routes and static assets.
+//
+// Files served from public/ (the INSA logo, favicon, fonts…) have to be listed
+// too: they are plain top-level paths, so without the extension exclusion below
+// the guard redirects them to /login and they render as broken images.
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!api/auth|_next/static|_next/image|.*\\.(?:ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|css|js|map|txt|xml|webmanifest)$).*)",
+  ],
 };
