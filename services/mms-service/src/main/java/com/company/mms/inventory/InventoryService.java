@@ -81,12 +81,19 @@ public class InventoryService {
         String materialId = materialReference == null || materialReference.isBlank()
                 ? null
                 : resolveMaterial(materialReference).getId();
-        String movementType = normalizeOptional(type);
-        if (movementType != null) {
-            movementType = movementType.toUpperCase();
-        }
-        return movementRepository.search(normalizeOptional(warehouseId), materialId, movementType)
+        String normalizedMovementType = normalizeOptional(type);
+        final String movementType = normalizedMovementType == null
+                ? null
+                : normalizedMovementType.toUpperCase();
+        String targetWarehouse = normalizeOptional(warehouseId);
+        return movementRepository.findAll()
                 .stream()
+                .filter(movement -> targetWarehouse == null || movement.getWarehouseId().equals(targetWarehouse))
+                .filter(movement -> materialId == null || movement.getMaterialId().equals(materialId))
+                .filter(movement -> movementType == null || movement.getType().equalsIgnoreCase(movementType))
+                .sorted(java.util.Comparator.comparing(com.company.mms.stockmovement.StockMovement::getMovementDate)
+                        .thenComparing(com.company.mms.stockmovement.StockMovement::getCreatedAt)
+                        .reversed())
                 .map(this::toMovementResponse)
                 .toList();
     }

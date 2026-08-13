@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import AppShell from "@/features/shared/components/app-shell";
+import DashboardShell from "./dashboard-shell";
 import { modulesForRoles } from "@/features/shared/config/roles";
 import { primaryHrRole } from "@/features/hrm/hr-roles";
 
@@ -15,8 +15,8 @@ export default async function DashboardLayout({
   const name = isDemo ? "Demo Inventory Manager" : session?.user?.name ?? session?.user?.email ?? "User";
 
   return (
-    <AppShell userName={name} modules={modules} hrRole={primaryHrRole(roles)}>
+    <DashboardShell userName={name} modules={modules} hrRole={primaryHrRole(roles)}>
       {children}
-    </AppShell>
+    </DashboardShell>
   );
 }

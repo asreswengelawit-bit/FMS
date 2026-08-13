@@ -2,6 +2,7 @@ package com.company.mms.item;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +31,19 @@ public class MaterialService {
         String cat = category != null && !category.isBlank() ? category.trim() : null;
         String q = search != null && !search.isBlank() ? search.trim() : null;
 
-        return repository.search(active, cat, q)
+        return repository.findAllByOrderByNameAsc()
                 .stream()
+                .filter(material -> active == null || material.isActive() == active)
+                .filter(material -> cat == null || material.getCategory().equalsIgnoreCase(cat))
+                .filter(material -> q == null || matchesSearch(material, q))
                 .map(this::toResponse)
                 .toList();
+    }
+
+    private boolean matchesSearch(Material material, String search) {
+        String query = search.toLowerCase(Locale.ROOT);
+        return material.getName().toLowerCase(Locale.ROOT).contains(query)
+                || material.getId().toLowerCase(Locale.ROOT).contains(query);
     }
 
     public MaterialResponse findById(String id) {

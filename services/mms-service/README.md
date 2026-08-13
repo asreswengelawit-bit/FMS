@@ -1,5 +1,17 @@
 # MMS Service
 
+## Java version
+
+This service requires **Java 21**. If your shell defaults to an older JDK, select Java 21 before building:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn test
+```
+
+Confirm with `java -version`; it must report version 21. The service Dockerfile also builds with Eclipse Temurin 21.
+
 Spring Boot backend for the INSA ERP Material Management System.
 
 ## Technology

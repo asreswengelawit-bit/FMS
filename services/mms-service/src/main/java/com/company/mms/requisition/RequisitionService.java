@@ -41,8 +41,11 @@ public class RequisitionService {
     public List<RequisitionResponse> findAll(String status, String department) {
         String stat = status != null && !status.isBlank() ? status.trim() : null;
         String dept = department != null && !department.isBlank() ? department.trim() : null;
-        return repository.search(stat, dept)
+        return repository.findAll()
                 .stream()
+                .filter(requisition -> stat == null || requisition.getStatus().equalsIgnoreCase(stat))
+                .filter(requisition -> dept == null || requisition.getDepartment().equalsIgnoreCase(dept))
+                .sorted(java.util.Comparator.comparing(Requisition::getCreatedAt).reversed())
                 .map(this::toResponse)
                 .toList();
     }

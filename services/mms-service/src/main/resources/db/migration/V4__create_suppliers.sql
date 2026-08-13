@@ -1,0 +1,14 @@
+CREATE TABLE suppliers (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(30),
+    address VARCHAR(1000),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_suppliers_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'BLOCKED', 'PROBATION'))
+);
+
+CREATE INDEX idx_suppliers_status ON suppliers(status);

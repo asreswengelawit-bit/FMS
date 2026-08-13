@@ -1,4 +1,4 @@
-import { items, movements, requisitions, warehouses } from "../data";
+import { items, movements, requisitions, suppliers, warehouses } from "../data";
 import type { MmsData } from "../types";
 
 export interface MmsRepository {
@@ -7,14 +7,17 @@ export interface MmsRepository {
 }
 
 const STORAGE_KEY = "insa_erp_mms_data_v1";
-const seed = (): MmsData => ({ items, movements, requisitions, warehouses });
+const seed = (): MmsData => ({ items, movements, requisitions, suppliers, warehouses });
 
 export class LocalMmsRepository implements MmsRepository {
   async load(): Promise<MmsData> {
     if (typeof window === "undefined") return seed();
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return seed();
-    try { return JSON.parse(stored) as MmsData; }
+    try {
+      const parsed = JSON.parse(stored) as Partial<MmsData>;
+      return { ...seed(), ...parsed, suppliers: parsed.suppliers ?? suppliers };
+    }
     catch { localStorage.removeItem(STORAGE_KEY); return seed(); }
   }
 

@@ -12,6 +12,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
   { href:"/mms/items", label:"Item Master", icon:"box" },
   { href:"/mms/inventory", label:"Inventory", icon:"layers" },
   { href:"/mms/warehouses", label:"Warehouses", icon:"warehouse" },
+  { href:"/mms/suppliers", label:"Suppliers", icon:"box" },
   { href:"/mms/stock-levels", label:"Stock Levels", icon:"layers" },
   { href:"/mms/stock-movements", label:"Stock Movements", icon:"movement" },
   { href:"/mms/goods-receipts", label:"Goods Receipts", icon:"receipt" },
@@ -21,6 +22,7 @@ const nav: { href: string; label: string; icon: IconName }[] = [
 
 const pageNames: Record<string,string> = {
   "/mms":"Overview", "/mms/items":"Item Master", "/mms/warehouses":"Warehouses",
+  "/mms/suppliers":"Suppliers",
   "/mms/inventory":"Inventory",
   "/mms/stock-levels":"Stock Levels", "/mms/stock-movements":"Stock Movements",
   "/mms/goods-receipts":"Goods Receipts", "/mms/requisitions":"Requisitions",
