@@ -1,4 +1,4 @@
-import type { MaterialItem, Requisition, StockMovement, Warehouse } from "./types";
+import type { MaterialItem, Requisition, StockMovement, Supplier, Warehouse } from "./types";
 
 export const items: MaterialItem[] = [
   { id:"ITM-001", name:"A4 Paper Box 500s", category:"Office Supplies", uom:"Box", onHand:145, reserved:20, reorderLevel:50, unitCost:3200, warehouse:"WH-Main", status:"Normal" },
@@ -35,6 +35,12 @@ export const requisitions: Requisition[] = [
   { id:"REQ-2025-054", requestedBy:"Abebe Girma", department:"Finance", item:"A4 Paper Box 500s", qty:5, date:"2025-07-14", status:"Issued", priority:"Normal" },
   { id:"REQ-2025-055", requestedBy:"Tigist Bekele", department:"Procurement", item:"Lab Test Kit Set", qty:3, date:"2025-07-15", status:"Pending", priority:"High" },
   { id:"REQ-2025-056", requestedBy:"Meron Kebede", department:"IT", item:"Spare HDD 2TB", qty:2, date:"2025-07-16", status:"Rejected", priority:"Normal" },
+];
+
+export const suppliers: Supplier[] = [
+  { id: "SUP-001", name: "Ethio Tech Supplies", contactPerson: "Mekdes Abebe", email: "sales@ethiotech.example", phoneNumber: "+251 911 100 200", address: "Addis Ababa", status: "ACTIVE" },
+  { id: "SUP-002", name: "Meseret Fuel", contactPerson: "Tesfaye Worku", email: "orders@meseret.example", phoneNumber: "+251 911 200 300", address: "Addis Ababa", status: "ACTIVE" },
+  { id: "SUP-003", name: "Hawassa Office Mart", contactPerson: "Hana Girma", email: "contact@hawassaoffice.example", phoneNumber: "+251 911 300 400", address: "Hawassa", status: "PROBATION" },
 ];
 
 export const formatEtb = (value: number) => `ETB ${value.toLocaleString("en-US")}`;

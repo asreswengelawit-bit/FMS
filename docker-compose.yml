@@ -69,6 +69,7 @@ services:
       MMS_DATABASE_URL: jdbc:postgresql://mms-db:5432/mms
       MMS_DATABASE_USERNAME: mms
       MMS_DATABASE_PASSWORD: ${MMS_DATABASE_PASSWORD:-mms}
+      MMS_DEV_AUTH: ${MMS_DEV_AUTH:-false}
       KEYCLOAK_ISSUER_URI: http://localhost:8080/realms/erp
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/erp/protocol/openid-connect/certs
     ports:
@@ -142,6 +143,10 @@ services:
       dockerfile: ../infrastructure/docker/frontend.Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+        # Local stack defaults to the UI demo mode. Set this to "keycloak" in
+        # .env only after configuring valid Keycloak client credentials.
+        NEXT_PUBLIC_AUTH_MODE: ${NEXT_PUBLIC_AUTH_MODE:-demo}
+        NEXT_PUBLIC_MMS_API_URL: ${NEXT_PUBLIC_MMS_API_URL:-http://localhost:8081}
         KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
         KEYCLOAK_FRONTEND_CLIENT_ID: ${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
     container_name: erp-frontend
@@ -152,6 +157,8 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - NEXT_PUBLIC_AUTH_MODE=${NEXT_PUBLIC_AUTH_MODE:-demo}
+      - NEXT_PUBLIC_MMS_API_URL=${NEXT_PUBLIC_MMS_API_URL:-http://localhost:8081}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
       # Browser-facing: Keycloak's login/logout redirects must resolve in the
       # user's browser, so this stays localhost even inside the container. See
@@ -170,6 +177,11 @@ services:
       - HRM_API_URL=${HRM_API_URL:-http://hrm-service:8081}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
+    # Auth.js runs inside this container but must validate the browser-facing
+    # Keycloak issuer, which is intentionally http://localhost:8080.  Map that
+    # hostname back to Docker's host gateway for its server-side token calls.
+    extra_hosts:
+      - "localhost:host-gateway"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
       interval: 20s

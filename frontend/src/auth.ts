@@ -2,6 +2,10 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Keycloak from "next-auth/providers/keycloak";
 
+// Keep local demo mode bootable when no Keycloak credentials have been
+// configured. Production/staging deployments should set KEYCLOAK_ISSUER.
+const keycloakIssuer = process.env.KEYCLOAK_ISSUER ?? "http://localhost:8080/realms/erp";
+
 /** Decode a JWT payload (no signature check — tokens come from Keycloak over TLS). */
 function decodeJwt(token?: string): Record<string, unknown> {
   if (!token) return {};
@@ -32,7 +36,7 @@ function expiryOf(expiresIn?: number): number {
  */
 async function refreshAccessToken(refreshToken: string) {
   const res = await fetch(
-    `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+    `${keycloakIssuer}/protocol/openid-connect/token`,
     {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -76,7 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         const res = await fetch(
-          `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+          `${keycloakIssuer}/protocol/openid-connect/token`,
           {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -114,7 +118,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Keycloak({
       clientId: process.env.KEYCLOAK_CLIENT_ID,
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-      issuer: process.env.KEYCLOAK_ISSUER,
+      issuer: keycloakIssuer,
     }),
   ],
   callbacks: {

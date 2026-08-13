@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatEtb } from "../data";
 import { useMms } from "../hooks/mms-store";
 import { validateItem, validateMovement, validateRequisition, validateWarehouse, type ValidationErrors } from "../schemas/validation";
-import type { MaterialItem, Requisition, StockMovement, Warehouse } from "../types";
+import type { MaterialItem, Requisition, StockMovement, Supplier, Warehouse } from "../types";
 import { downloadCsv } from "../utils/csv";
 import { Icon, type IconName } from "./icons";
 
@@ -131,6 +131,33 @@ export function ItemsView() {
 export function WarehousesView() {
   const { warehouses, notify } = useMms(); const [modal, setModal] = useState<ModalKind | null>(null);
   return <div className="page-content"><PageHead title="Warehouses" description="Manage storage locations, capacity, ownership, and utilization" button="Create Warehouse" onAdd={() => setModal("warehouse")} /><Metrics /><div className="warehouse-cards" style={{ marginBottom: 16 }}>{warehouses.map(warehouse => { const percent = Math.round(warehouse.used / warehouse.capacity * 100); return <div className="panel" key={warehouse.id}><div className="panel-body"><div className="warehouse-top"><div><div className="warehouse-code">{warehouse.id}</div><div className="warehouse-name" style={{ fontSize: 13 }}>{warehouse.name}</div><div className="warehouse-location">{warehouse.location}</div></div><Status value={warehouse.type} /></div><div className="capacity-meta"><span>{warehouse.items} items</span><b>{percent}% used</b></div><div className="bar-track"><div className="bar-fill" style={{ width: `${percent}%`, background: percent > 75 ? "#D97706" : "#16A34A" }} /></div><button className="secondary-button" style={{ marginTop: 14 }} onClick={() => notify(`${warehouse.name} is managed by ${warehouse.manager}`, "info")}>View details</button></div></div>; })}</div><Panel title="Warehouse Directory"><div className="table-wrap"><table className="data-table"><thead><tr>{["Code", "Warehouse", "Location", "Type", "Capacity", "Used", "Available", "Items", "Manager", "Status"].map(header => <th key={header}>{header}</th>)}</tr></thead><tbody>{warehouses.map(warehouse => <tr key={warehouse.id}><td className="cell-code">{warehouse.id}</td><td className="cell-primary">{warehouse.name}</td><td>{warehouse.location}</td><td><Status value={warehouse.type} /></td><td>{warehouse.capacity.toLocaleString()}</td><td>{warehouse.used.toLocaleString()}</td><td>{(warehouse.capacity - warehouse.used).toLocaleString()}</td><td>{warehouse.items}</td><td>{warehouse.manager}</td><td><Status value="Active" /></td></tr>)}</tbody></table></div></Panel>{modal && <RecordModal kind={modal} onClose={() => setModal(null)} />}</div>;
+}
+
+export function SuppliersView() {
+  const { suppliers, addSupplier, updateSupplier, deactivateSupplier, canWrite } = useMms();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [editing, setEditing] = useState<Supplier | null>(null);
+  const [form, setForm] = useState<Supplier>({ id: "", name: "", contactPerson: "", email: "", phoneNumber: "", address: "", status: "ACTIVE" });
+  const [saving, setSaving] = useState(false);
+  const rows = useMemo(() => suppliers.filter(supplier => (filter === "all" || supplier.status === filter) && `${supplier.id} ${supplier.name} ${supplier.contactPerson} ${supplier.email ?? ""}`.toLowerCase().includes(query.toLowerCase())), [suppliers, query, filter]);
+  const [page, setPage] = usePage([query, filter]);
+  const openCreate = () => { setEditing(null); setForm({ id: "", name: "", contactPerson: "", email: "", phoneNumber: "", address: "", status: "ACTIVE" }); };
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!form.id.trim() || !form.name.trim() || !form.contactPerson.trim()) return;
+    setSaving(true);
+    try { if (editing) await updateSupplier(form); else await addSupplier(form); openCreate(); }
+    finally { setSaving(false); }
+  };
+  const set = <K extends keyof Supplier>(key: K, value: Supplier[K]) => setForm(current => ({ ...current, [key]: value }));
+  return <div className="page-content"><PageHead title="Suppliers" description="Maintain supplier master data for purchasing and goods-receipt operations" button="Add Supplier" onAdd={openCreate} /><Metrics />
+    <div className="dashboard-grid"><Panel title={editing ? `Edit ${editing.id}` : "Supplier details"} sub="Supplier code, contact information, and lifecycle status"><div className="panel-body"><form className="record-form" onSubmit={submit}><div className="form-grid">
+      {([ ["id", "Supplier Code"], ["name", "Supplier Name"], ["contactPerson", "Contact Person"], ["email", "Email"], ["phoneNumber", "Phone Number"], ["address", "Address"] ] as Array<[keyof Supplier, string]>).map(([key, label]) => <label className="field" key={key}>{label}<input className="control" required={key === "id" || key === "name" || key === "contactPerson"} disabled={key === "id" && Boolean(editing)} value={String(form[key] ?? "")} onChange={event => set(key, event.target.value as never)} /></label>)}
+      <label className="field">Status<select className="control" value={form.status} onChange={event => set("status", event.target.value as Supplier["status"])}>{["ACTIVE", "INACTIVE", "PROBATION", "BLOCKED"].map(status => <option key={status}>{status}</option>)}</select></label>
+    </div><div className="modal-actions"><button type="button" className="secondary-button" onClick={openCreate}>Clear</button><button className="primary-button" disabled={!canWrite || saving} type="submit">{saving ? "Saving..." : editing ? "Save Supplier" : "Create Supplier"}</button></div></form></div></Panel>
+      <Panel title="Supplier summary" sub="Current supplier master records"><div className="panel-body stock-bars"><div className="stock-bar-meta"><span>Active suppliers</span><b>{suppliers.filter(supplier => supplier.status === "ACTIVE").length}</b></div><div className="stock-bar-meta"><span>Inactive suppliers</span><b>{suppliers.filter(supplier => supplier.status === "INACTIVE").length}</b></div><div className="stock-bar-meta"><span>Review required</span><b>{suppliers.filter(supplier => supplier.status === "PROBATION" || supplier.status === "BLOCKED").length}</b></div></div></Panel></div>
+    <Panel title={`Supplier Directory (${rows.length})`} toolbar={<SearchToolbar query={query} setQuery={setQuery} filter={filter} setFilter={setFilter} label="All statuses" options={["ACTIVE", "INACTIVE", "PROBATION", "BLOCKED"]} onExport={() => downloadCsv("mms-suppliers.csv", rows.map(supplier => ({ Code: supplier.id, Name: supplier.name, Contact: supplier.contactPerson, Email: supplier.email ?? "", Phone: supplier.phoneNumber ?? "", Status: supplier.status })))} />}><div className="table-wrap"><table className="data-table"><thead><tr>{["Code", "Supplier", "Contact", "Email", "Phone", "Address", "Status", "Actions"].map(header => <th key={header}>{header}</th>)}</tr></thead><tbody>{rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(supplier => <tr key={supplier.id}><td className="cell-code">{supplier.id}</td><td className="cell-primary">{supplier.name}</td><td>{supplier.contactPerson}</td><td>{supplier.email ?? "—"}</td><td>{supplier.phoneNumber ?? "—"}</td><td>{supplier.address ?? "—"}</td><td><Status value={supplier.status === "ACTIVE" ? "Active" : supplier.status} /></td><td><div className="filters"><button aria-label={`Edit ${supplier.name}`} className="icon-button" onClick={() => { setEditing(supplier); setForm(supplier); }}><Icon name="edit" width="13" /></button>{supplier.status !== "INACTIVE" && <button disabled={!canWrite} className="table-action" onClick={() => deactivateSupplier(supplier.id)}>Deactivate</button>}</div></td></tr>)}</tbody></table>{!rows.length && <div className="empty-state"><Icon name="search" /><div>No suppliers match your search.</div></div>}</div><Pagination count={rows.length} page={page} setPage={setPage} /></Panel></div>;
 }
 
 function InventoryTable({ title = "Inventory" }: { title?: string }) {

@@ -10,6 +10,13 @@ import { canAccessPath, homePathForRoles } from "@/features/shared/config/roles"
  *  - A logged-in user hitting /login is bounced to their module home.
  */
 export default auth((req) => {
+  // Explicit local-only demo mode: it lets developers inspect the UI without
+  // starting Keycloak. It is opt-in through frontend/.env.local and leaves
+  // every normal (Keycloak-backed) environment protected.
+  if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") {
+    return NextResponse.next();
+  }
+
   const { nextUrl } = req;
   const path = nextUrl.pathname;
   const isLoggedIn = !!req.auth;

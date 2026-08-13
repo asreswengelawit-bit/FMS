@@ -20,11 +20,19 @@ export interface Requisition {
   date: string; status: "Issued" | "Pending" | "Rejected"; priority: "Normal" | "High" | "Urgent";
 }
 
+export type SupplierStatus = "ACTIVE" | "INACTIVE" | "BLOCKED" | "PROBATION";
+
+export interface Supplier {
+  id: string; name: string; contactPerson: string; email?: string; phoneNumber?: string;
+  address?: string; status: SupplierStatus;
+}
+
 export interface MmsData {
   items: MaterialItem[];
   warehouses: Warehouse[];
   movements: StockMovement[];
   requisitions: Requisition[];
+  suppliers: Supplier[];
 }
 
 export type MmsRole = "inventory_manager" | "store_keeper" | "viewer";

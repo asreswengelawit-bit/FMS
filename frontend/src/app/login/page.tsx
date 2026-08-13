@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff, Lock, Shield, User } from "lucide-react";
 
@@ -10,11 +11,22 @@ import { Input } from "@/features/shared/components/ui/input";
 import { Label } from "@/features/shared/components/ui/label";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // The local Docker demo does not require an identity-provider session.
+  // Sending /login to MMS also prevents accidental credential submissions.
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") {
+      router.replace("/mms");
+    }
+  }, [router]);
+
+  if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") return null;
 
   // Unchanged: Auth.js posts these to Keycloak's token endpoint server-side
   // (password grant against the confidential erp-frontend client).
