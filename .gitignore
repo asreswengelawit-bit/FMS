@@ -5,6 +5,7 @@
 !.env.example
 
 # ---- Java / Maven / Gradle ----
+target/
 .gradle/
 build/
 target/

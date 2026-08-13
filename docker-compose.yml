@@ -17,6 +17,28 @@
 # Admin console:  http://localhost:8080/   (login with KC_BOOTSTRAP_ADMIN_*)
 # OIDC issuer:    http://localhost:8080/realms/erp
 # Frontend app:   http://localhost:3000/
+#
+# ---------------------------------------------------------------------------
+# Keycloak hostname: one URL, two networks
+# ---------------------------------------------------------------------------
+# The issuer URL has to satisfy three parties at once:
+#   * the browser  -> follows login/logout redirects
+#   * the frontend -> calls the token endpoint server-side
+#   * the services -> fetch JWKS and check the token's `iss` claim
+# Tokens carry `iss: http://localhost:8080/realms/erp` (KC_HOSTNAME), so every
+# validator must use exactly that string or it rejects valid tokens.
+#
+# Containers cannot reach the host's localhost. Pick one:
+#   a) run the frontend and services on the host (npm run dev / mvnw
+#      spring-boot:run) and leave everything on localhost:8080 — the default,
+#      and what the module READMEs assume;
+#   b) containerise them and add to each service:
+#          extra_hosts:
+#            - "localhost:host-gateway"
+#      so `localhost:8080` inside the container reaches Keycloak on the host
+#      while the `iss` claim still matches.
+# Do NOT switch the issuer to http://keycloak:8080 alone: server-side calls
+# would work, but browser redirects and `iss` validation would both break.
 # ============================================================================
 
 services:
@@ -123,14 +145,29 @@ services:
         KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
         KEYCLOAK_FRONTEND_CLIENT_ID: ${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
     container_name: erp-frontend
+    # The repo-wide .env uses infrastructure names (KEYCLOAK_ISSUER_URI,
+    # KEYCLOAK_FRONTEND_CLIENT_ID); Auth.js in src/auth.ts reads the app names
+    # (KEYCLOAK_ISSUER, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, AUTH_SECRET).
+    # Map one onto the other here so both keep their own convention.
     environment:
       - NODE_ENV=production
       - PORT=3000
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
-      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
-      - KEYCLOAK_FRONTEND_CLIENT_ID=${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-super-secret-key-change-in-production}
+      # Browser-facing: Keycloak's login/logout redirects must resolve in the
+      # user's browser, so this stays localhost even inside the container. See
+      # the hostname note at the top of this file.
+      - KEYCLOAK_ISSUER=${KEYCLOAK_ISSUER_URI:-http://localhost:8080/realms/erp}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_FRONTEND_CLIENT_ID:-erp-frontend}
+      # Confidential client: without the secret the password grant returns
+      # "unauthorized_client" and every login fails.
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_FRONTEND_CLIENT_SECRET:?set KEYCLOAK_FRONTEND_CLIENT_SECRET in .env}
+      # Auth.js v5 names: AUTH_SECRET encrypts the session cookie, and
+      # AUTH_TRUST_HOST is required behind Docker's port mapping.
+      - AUTH_SECRET=${AUTH_SECRET:?set AUTH_SECRET in .env (npx auth secret)}
+      - AUTH_TRUST_HOST=true
+      - AUTH_URL=${AUTH_URL:-http://localhost:3000}
+      # Backend services, reachable over the compose network once containerised.
+      - HRM_API_URL=${HRM_API_URL:-http://hrm-service:8081}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     healthcheck:

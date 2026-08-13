@@ -47,13 +47,13 @@ const HR_SUBNAV: Record<string, { label: string; path: string }[]> = {
     p("Dashboard"), p("My Team"), p("Team Attendance"), p("Approvals"),
   ],
   hrm_employee: [p("Dashboard"), p("My Attendance"), p("My Leave"), p("My Profile")],
-  hrm_user: [p("Dashboard")],
+  hrm_default: [p("Dashboard")],
 };
 
 export default function AppShell({
   userName,
   modules,
-  hrRole = "hrm_user",
+  hrRole = "hrm_default",
   children,
 }: {
   userName: string;
@@ -93,7 +93,7 @@ export default function AppShell({
           {modules.map((m) => {
             const items =
               m.key === "hrm"
-                ? (HR_SUBNAV[hrRole] ?? HR_SUBNAV.hrm_user)
+                 ? (HR_SUBNAV[hrRole] ?? HR_SUBNAV.hrm_default)
                 : m.key === "mms"
                 ? MMS_SUBNAV
                 : m.key === "crm"
