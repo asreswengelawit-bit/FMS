@@ -69,6 +69,7 @@ services:
       MMS_DATABASE_URL: jdbc:postgresql://mms-db:5432/mms
       MMS_DATABASE_USERNAME: mms
       MMS_DATABASE_PASSWORD: ${MMS_DATABASE_PASSWORD:-mms}
+      MMS_DEV_AUTH: ${MMS_DEV_AUTH:-false}
       KEYCLOAK_ISSUER_URI: http://localhost:8080/realms/erp
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/erp/protocol/openid-connect/certs
     ports:
