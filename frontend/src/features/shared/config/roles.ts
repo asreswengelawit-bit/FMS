@@ -35,9 +35,11 @@ export function modulesForRoles(roles: string[]): ModuleDef[] {
   return MODULES.filter((m) => grantsModule(roles, m));
 }
 
-/** Where to send a user right after login: their first allowed module. */
+/** Where to send a user right after login. The module grid at "/" lists every
+ * accessible module, so users land there instead of being dropped into a single
+ * module. Fall back to /unauthorized only when the account has no entitlements. */
 export function homePathForRoles(roles: string[]): string {
-  return modulesForRoles(roles)[0]?.path ?? "/unauthorized";
+  return modulesForRoles(roles).length > 0 ? "/" : "/unauthorized";
 }
 
 /** The module a given path belongs to, if any (e.g. "/hrm/employees" -> hrm). */

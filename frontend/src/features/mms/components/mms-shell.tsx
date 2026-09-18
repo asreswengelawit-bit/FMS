@@ -55,6 +55,7 @@ export function MmsShell({ children }: { children: React.ReactNode }) {
           </nav>
           <div className="nav-eyebrow" style={{marginTop:24}}>SYSTEM</div>
           <div className="mms-nav">
+            <Link href="/" onClick={()=>setOpen(false)} className="nav-link"><Icon name="dashboard" className="nav-icon"/>All Modules</Link>
             <span className="nav-link"><Icon name="settings" className="nav-icon"/>Settings</span>
           </div>
         </div>

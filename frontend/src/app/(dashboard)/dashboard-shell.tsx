@@ -7,7 +7,6 @@ import type { ModuleDef } from "@/features/shared/config/roles";
 type DashboardShellProps = {
   userName: string;
   modules: ModuleDef[];
-  hrRole: string;
   children: React.ReactNode;
 };
 
@@ -20,6 +19,10 @@ export default function DashboardShell({ children, ...shellProps }: DashboardShe
   const pathname = usePathname();
 
   if (pathname === "/mms" || pathname.startsWith("/mms/")) {
+    return <>{children}</>;
+  }
+
+  if (pathname === "/fms" || pathname.startsWith("/fms/")) {
     return <>{children}</>;
   }
 

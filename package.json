@@ -1,1 +1,10 @@
-{}
+{
+	"name": "erp-insa",
+	"private": true,
+	"scripts": {
+		"dev": "npm --prefix frontend run dev",
+		"build": "npm --prefix frontend run build",
+		"start": "npm --prefix frontend run start",
+		"lint": "npm --prefix frontend run lint"
+	}
+}

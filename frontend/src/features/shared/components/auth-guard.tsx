@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authMode } from "../lib/auth";
+import { useSession } from "next-auth/react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(authMode !== "keycloak");
+  const { data: session, status } = useSession();
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    if (authMode !== "keycloak") return;
-    if (!sessionStorage.getItem("erp_access_token")) window.location.replace("/login");
-    else setReady(true);
-  }, []);
+    if (status === "loading") return;
+    if (!session) {
+      window.location.replace("/login");
+    } else {
+      setReady(true);
+    }
+  }, [session, status]);
+
   return ready ? children : <main className="auth-page"><div className="auth-card">Checking your session…</div></main>;
 }

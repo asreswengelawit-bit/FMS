@@ -5,7 +5,7 @@ import { LocalMmsRepository } from "../api/repository";
 import { mmsApi } from "../api/http-client";
 import { items as seedItems, movements as seedMovements, requisitions as seedRequisitions, suppliers as seedSuppliers, warehouses as seedWarehouses } from "../data";
 import type { MaterialItem, MmsData, MmsUser, Requisition, StockMovement, Supplier, Warehouse } from "../types";
-import { authMode, userFromAccessToken } from "@/features/shared/lib/auth";
+import { userFromAccessToken } from "@/features/shared/lib/auth";
 
 type Toast = { id: number; message: string; tone: "success" | "error" | "info" };
 type MmsContextValue = MmsData & {
@@ -57,11 +57,9 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (authMode === "keycloak") setUser(userFromAccessToken() ?? { ...demoUser, role: "viewer", permissions: ["mms:read"] });
+    setUser(userFromAccessToken() ?? { ...demoUser, role: "viewer", permissions: ["mms:read"] });
     
-    // Demo mode is deliberately UI-only.  A local API URL may still be set
-    // for other workflows, but demo users do not have a bearer token for it.
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true);
       refreshLive()
@@ -90,7 +88,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [notify]);
 
   const addItem = useCallback(async (item: MaterialItem) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -110,7 +108,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const updateItem = useCallback(async (item: MaterialItem) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -130,7 +128,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const addWarehouse = useCallback(async (warehouse: Warehouse) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -150,7 +148,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const recordMovement = useCallback(async (movement: StockMovement) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -189,7 +187,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const addRequisition = useCallback(async (requisition: Requisition) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -213,7 +211,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const issueRequisition = useCallback(async (id: string) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try {
@@ -240,7 +238,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, refreshLive, notify]);
 
   const addSupplier = useCallback(async (supplier: Supplier) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try { await mmsApi.createSupplier(supplier); await refreshLive(); notify(`${supplier.name} was added`); }
@@ -250,7 +248,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, notify, refreshLive]);
 
   const updateSupplier = useCallback(async (supplier: Supplier) => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try { await mmsApi.updateSupplier(supplier); await refreshLive(); notify(`${supplier.name} was updated`); }
@@ -262,7 +260,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   const deactivateSupplier = useCallback(async (id: string) => {
     const supplier = data.suppliers.find(current => current.id === id);
     if (!supplier) return;
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       setLoading(true); setError(null);
       try { await mmsApi.deleteSupplier(id); await refreshLive(); notify(`${supplier.name} was deactivated`); }
@@ -272,7 +270,7 @@ export function MmsProvider({ children }: { children: React.ReactNode }) {
   }, [commit, data, notify, refreshLive]);
 
   const resetData = useCallback(async () => {
-    const isLive = authMode !== "demo" && Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
+    const isLive = Boolean(process.env.NEXT_PUBLIC_MMS_API_URL);
     if (isLive) {
       notify("Cannot reset live database from UI", "info");
     } else {

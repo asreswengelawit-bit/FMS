@@ -1,6 +1,6 @@
 import type { MmsRole, MmsUser } from "@/features/mms/types";
 
-export const authMode = process.env.NEXT_PUBLIC_AUTH_MODE ?? "demo";
+export const authMode = process.env.NEXT_PUBLIC_AUTH_MODE ?? "keycloak";
 export const keycloakIssuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER ?? "http://localhost:8080/realms/erp";
 export const keycloakClientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ?? "erp-frontend";
 

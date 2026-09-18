@@ -1,10 +1,20 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { listJournals } from "@/features/fms/api/journals";
+import { listAccounts } from "@/features/fms/api/coa";
+import { listPeriods } from "@/features/fms/api/journals";
+import JournalManager from "@/features/fms/components/JournalManager";
 
-export default function Page() {
+export default async function JournalsPage() {
+  const [journalsData, accountsData, periods] = await Promise.all([
+    listJournals(),
+    listAccounts({ page: 0, size: 50 }),
+    listPeriods(),
+  ]);
+
   return (
-    <ModuleDashboard
-      title="journals"
-      description="Welcome to the journals module overview."
+    <JournalManager
+      initialJournals={journalsData.content ?? []}
+      accounts={accountsData.content ?? []}
+      periods={periods}
     />
   );
 }

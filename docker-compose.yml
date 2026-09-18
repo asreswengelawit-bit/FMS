@@ -39,6 +39,32 @@
 #      while the `iss` claim still matches.
 # Do NOT switch the issuer to http://keycloak:8080 alone: server-side calls
 # would work, but browser redirects and `iss` validation would both break.
+#
+# ---------------------------------------------------------------------------
+# Local Postgres fallback (no Neon)
+# ---------------------------------------------------------------------------
+# Each module can also run against a plain container Postgres instead of Neon.
+# The `*-db` services below map to each Spring service's default datasource so
+# host-run services work with zero extra config (the rest of the stack, e.g.
+# keycloak, rabbitmq, frontend, is unchanged):
+#
+#   hrm   jdbc:postgresql://localhost:5431/hrm?currentSchema=hrm_schema  (hrm/hrm)
+#         -> hrm only reads DATABASE_URL (see DatabaseUrlEnvironmentPostProcessor);
+#            point it at the line above when not using Neon.
+#   prms  jdbc:postgresql://localhost:5435/prms  (postgres/postgres)
+#         -> 5432 is the module's code default but is usually taken by a local
+#            Postgres / legacy stack; point PRMS at the compose DB with
+#            POSTGRES_PORT=5435 when running it on the host.
+#   mms   jdbc:postgresql://localhost:5433/mms   (mms/mms)
+#   fms   jdbc:postgresql://localhost:5434/fms   (fms/fms)
+#   crm   jdbc:postgresql://localhost:5436/crm   (crm/crm)
+#         -> crm reads DB_URL and needs an application.properties copied from
+#            src/main/resources/application.properties.example.
+#
+# Demo-mode auth: FMS ships with dev-auth on (FMS_DEV_AUTH=true default) and HRM
+# has hrm.security.enabled=false, so the UI can read/write without Keycloak. MMS
+# ships with dev-auth OFF (MMS_DEV_AUTH=false) — set MMS_DEV_AUTH=true to let the
+# demo-mode UI write. PRMS/CRM always validate JWTs against Keycloak.
 # ============================================================================
 
 services:
@@ -79,6 +105,78 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+    restart: unless-stopped
+
+  hrm-db:
+    image: postgres:16
+    container_name: erp-hrm-db
+    environment:
+      POSTGRES_DB: hrm
+      POSTGRES_USER: hrm
+      POSTGRES_PASSWORD: ${HRM_DATABASE_PASSWORD:-hrm}
+    ports:
+      - "${HRM_DATABASE_PORT:-5431}:5432"
+    volumes:
+      - hrm_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hrm -d hrm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  prms-db:
+    image: postgres:16
+    container_name: erp-prms-db
+    environment:
+      POSTGRES_DB: prms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${PRMS_DATABASE_PASSWORD:-postgres}
+    ports:
+      - "${PRMS_DATABASE_PORT:-5435}:5432"
+    volumes:
+      - prms_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d prms"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  fms-db:
+    image: postgres:16
+    container_name: erp-fms-db
+    environment:
+      POSTGRES_DB: fms
+      POSTGRES_USER: fms
+      POSTGRES_PASSWORD: ${FMS_DATABASE_PASSWORD:-fms}
+    ports:
+      - "${FMS_DATABASE_PORT:-5434}:5432"
+    volumes:
+      - fms_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fms -d fms"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  crm-db:
+    image: postgres:16
+    container_name: erp-crm-db
+    environment:
+      POSTGRES_DB: crm
+      POSTGRES_USER: crm
+      POSTGRES_PASSWORD: ${CRM_DATABASE_PASSWORD:-crm}
+    ports:
+      - "${CRM_DATABASE_PORT:-5436}:5432"
+    volumes:
+      - crm_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm -d crm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   keycloak-db:
@@ -135,6 +233,31 @@ services:
     restart: unless-stopped
 
   # ----------------------------------------------------------------------------
+  # RabbitMQ — event bus for the microservices (CRM, PRMS)
+  # ----------------------------------------------------------------------------
+  # Spring AMQP clients reach this broker at `rabbitmq:5672` from within the
+  # compose network. The host ports (5672 AMQP, 15672 management UI) are the
+  # same values PRMS/CRM use by default when run on the host.
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: erp-rabbitmq
+    hostname: erp-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
   # Shared Frontend Web Application (Next.js 15 App Router)
   # ----------------------------------------------------------------------------
   frontend:
@@ -159,6 +282,7 @@ services:
       - PORT=3000
       - NEXT_PUBLIC_AUTH_MODE=${NEXT_PUBLIC_AUTH_MODE:-demo}
       - NEXT_PUBLIC_MMS_API_URL=${NEXT_PUBLIC_MMS_API_URL:-http://localhost:8081}
+      - NEXT_PUBLIC_FMS_API_URL=${NEXT_PUBLIC_FMS_API_URL:-http://localhost:8084}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
       # Browser-facing: Keycloak's login/logout redirects must resolve in the
       # user's browser, so this stays localhost even inside the container. See
@@ -194,5 +318,10 @@ services:
         condition: service_healthy
 
 volumes:
+  hrm_pgdata:
+  prms_pgdata:
   mms_pgdata:
+  fms_pgdata:
+  crm_pgdata:
   keycloak_pgdata:
+  rabbitmq_data:

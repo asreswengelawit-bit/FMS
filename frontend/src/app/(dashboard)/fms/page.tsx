@@ -1,10 +1,5 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { redirect } from "next/navigation";
 
-export default function FmsPage() {
-  return (
-    <ModuleDashboard
-      title="Finance"
-      description="Welcome to the FMS module dashboard."
-    />
-  );
+export default function FmsHomePage() {
+  redirect("/fms/chart-of-accounts");
 }

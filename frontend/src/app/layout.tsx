@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import StyledComponentsRegistry from "@/styles/registry";
 import { GlobalStyle } from "@/styles/global-style";
-import "./globals.css";
+import { ToastProvider } from "@/providers/toast-provider";
 
 export const metadata: Metadata = {
   title: "INSA-ERP",
@@ -21,7 +21,9 @@ export default function RootLayout({
       <body>
         <StyledComponentsRegistry>
           <GlobalStyle />
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

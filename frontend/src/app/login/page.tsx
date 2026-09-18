@@ -18,18 +18,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // The local Docker demo does not require an identity-provider session.
-  // Sending /login to MMS also prevents accidental credential submissions.
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") {
-      router.replace("/mms");
-    }
-  }, [router]);
-
-  if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") return null;
-
-  // Unchanged: Auth.js posts these to Keycloak's token endpoint server-side
-  // (password grant against the confidential erp-frontend client).
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -89,7 +77,9 @@ export default function LoginPage() {
               Sign In
             </h2>
             <p className="mb-6 text-sm text-muted-foreground">
-              Enter your credentials to access the system
+              {process.env.NEXT_PUBLIC_AUTH_MODE === "demo"
+                ? "Use the local administrator account to access the system"
+                : "Enter your credentials to access the system"}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -150,6 +140,12 @@ export default function LoginPage() {
                 {loading ? "Signing in…" : "Sign In Securely"}
               </Button>
             </form>
+
+            {process.env.NEXT_PUBLIC_AUTH_MODE === "demo" && (
+              <p className="mt-4 text-xs text-muted-foreground">
+                Local demo: admin@insa.erp / Admin@123
+              </p>
+            )}
 
             <div className="my-5 h-px bg-border" />
 

@@ -9,6 +9,10 @@ import { Icon } from "@/features/shared/components/icons";
 import { theme } from "@/styles/theme";
 import type { ModuleDef } from "@/features/shared/config/roles";
 import { CRM_NAV } from "@/features/shared/config/navigation/crm-nav";
+import { FMS_NAV } from "@/features/shared/config/navigation/fms-nav";
+import { HRM_NAV } from "@/features/shared/config/navigation/hrm-nav";
+import { MMS_NAV } from "@/features/shared/config/navigation/mms-nav";
+import { PRMS_NAV } from "@/features/shared/config/navigation/prms-nav";
 
 const MODULE_TITLE: Record<string, string> = {
   hrm: "Human Resource Management",
@@ -18,47 +22,13 @@ const MODULE_TITLE: Record<string, string> = {
   fms: "Financial Management System",
 };
 
-const MMS_SUBNAV = [
-  { label: "Dashboard", path: "/mms" },
-  { label: "Item Master", path: "/mms/items" },
-  { label: "Inventory", path: "/mms/inventory" },
-  { label: "Warehouses", path: "/mms/warehouses" },
-  { label: "Stock Levels", path: "/mms/stock-levels" },
-  { label: "Stock Movements", path: "/mms/stock-movements" },
-  { label: "Goods Receipts", path: "/mms/goods-receipts" },
-  { label: "Requisitions", path: "/mms/requisitions" },
-  { label: "Reports & Analytics", path: "/mms/reports" },
-];
-
-const p = (label: string) => ({ label, path: "/hrm" });
-const HR_SUBNAV: Record<string, { label: string; path: string }[]> = {
-  hrm_admin: [
-    p("Dashboard"), p("Employees"), p("Departments"), p("Positions"),
-    p("Attendance"), p("Leave"), p("Payroll Support"),
-    p("Assignment History"), p("Reports"), p("Audit Log"),
-  ],
-  hrm_operations_manager: [
-    p("Dashboard"), p("Attendance"), p("Leave"), p("Payroll Support"), p("Reports"),
-  ],
-  hrm_recruitment_officer: [
-    p("Dashboard"), p("Positions"), p("Candidates"), p("Interviews"), p("Reports"),
-  ],
-  hrm_department_manager: [
-    p("Dashboard"), p("My Team"), p("Team Attendance"), p("Approvals"),
-  ],
-  hrm_employee: [p("Dashboard"), p("My Attendance"), p("My Leave"), p("My Profile")],
-  hrm_default: [p("Dashboard")],
-};
-
 export default function AppShell({
   userName,
   modules,
-  hrRole = "hrm_default",
   children,
 }: {
   userName: string;
   modules: ModuleDef[];
-  hrRole?: string;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -93,13 +63,24 @@ export default function AppShell({
           {modules.map((m) => {
             const items =
               m.key === "hrm"
-                 ? (HR_SUBNAV[hrRole] ?? HR_SUBNAV.hrm_default)
+                ? [...HRM_NAV]
+                : m.key === "prms"
+                ? [...PRMS_NAV]
                 : m.key === "mms"
-                ? MMS_SUBNAV
+                ? [...MMS_NAV]
                 : m.key === "crm"
                 ? [...CRM_NAV]
+                : m.key === "fms"
+                ? [...FMS_NAV]
                 : [{ label: "Dashboard", path: m.path }];
-            const iconName = m.key === "mms" ? "layers" : m.key === "hrm" ? "users" : "grid";
+            const iconName =
+              m.key === "mms"
+                ? "layers"
+                : m.key === "hrm"
+                ? "users"
+                : m.key === "fms"
+                ? "receipt"
+                : "grid";
             const isOpen = open === m.key;
             const isActive = active?.key === m.key;
             return (

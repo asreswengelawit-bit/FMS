@@ -70,6 +70,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(creds) {
         if (!creds?.email || !creds?.password) return null;
 
+        if (process.env.NEXT_PUBLIC_AUTH_MODE === "demo") {
+          const email = String(creds.email);
+          const password = String(creds.password);
+          if (email !== (process.env.DEMO_ADMIN_EMAIL ?? "admin@insa.erp") ||
+              password !== (process.env.DEMO_ADMIN_PASSWORD ?? "Admin@123")) {
+            return null;
+          }
+
+          return {
+            id: "demo-admin",
+            name: "Demo Administrator",
+            email,
+            roles: ["admin", "fms_admin"],
+          };
+        }
+
         const body = new URLSearchParams({
           grant_type: "password",
           client_id: process.env.KEYCLOAK_CLIENT_ID!,
@@ -150,6 +166,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.idToken = u.idToken;
         token.expiresAt = u.expiresAt;
         token.roles = u.roles ?? [];
+        return token;
+      }
+      // Demo mode: `authorize` returns roles without an access token. Carry
+      // them into the session so the middleware can authorise module access.
+      // (Checked after the access-token branch above; demo users have none.)
+      if (u?.roles) {
+        token.roles = u.roles;
         return token;
       }
 

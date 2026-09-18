@@ -1,0 +1,41 @@
+server:
+  port: ${FMS_PORT:8084}
+
+spring:
+  application:
+    name: fms-service
+  datasource:
+    url: ${FMS_DATABASE_URL:jdbc:postgresql://localhost:5434/fms}
+    username: ${FMS_DATABASE_USERNAME:fms}
+    password: ${FMS_DATABASE_PASSWORD:fms}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: non_null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/erp}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/erp/protocol/openid-connect/certs}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    com.company.fms: INFO

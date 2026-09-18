@@ -1,10 +1,9 @@
-import ModuleDashboard from "@/features/shared/components/module-dashboard";
+import { listAccounts } from "@/features/fms/api/coa";
+import CoaManager from "@/features/fms/components/CoaManager";
 
-export default function Page() {
-  return (
-    <ModuleDashboard
-      title="chart-of-accounts"
-      description="Welcome to the chart-of-accounts module overview."
-    />
-  );
+export default async function ChartOfAccountsPage() {
+  const data = await listAccounts({ page: 0, size: 50 });
+  const accounts = data.content ?? [];
+
+  return <CoaManager initialAccounts={accounts} />;
 }
