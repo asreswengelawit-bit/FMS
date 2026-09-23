@@ -61,6 +61,7 @@ export default function VendorManager({ initialVendors }: VendorManagerProps) {
         defaultApAccountId: null,
         defaultApAccountCode: null,
         defaultApAccountName: null,
+        apBalance: 0,
         status: "ACTIVE",
         createdBy: "general_accountant",
         createdAt: new Date().toISOString(),
@@ -79,6 +80,7 @@ export default function VendorManager({ initialVendors }: VendorManagerProps) {
     setError(null);
     const form = new FormData(e.currentTarget as HTMLFormElement);
     const input = {
+      vendorCode: selectedVendor.vendorCode,
       name: String(form.get("name") || "").trim(),
       email: String(form.get("email") || "").trim() || undefined,
       phone: String(form.get("phone") || "").trim() || undefined,
@@ -87,9 +89,9 @@ export default function VendorManager({ initialVendors }: VendorManagerProps) {
     };
     const res = await updateVendorAction(selectedVendor.id, input);
     if (res.ok) {
-      const patch = { ...input, email: input.email ?? null, phone: input.phone ?? null, address: input.address ?? null, taxId: input.taxId ?? null };
-      setVendors(vendors.map(v => v.id === selectedVendor.id ? { ...v, ...patch } : v));
-      setSelectedVendor({ ...selectedVendor, ...patch });
+      const patch = { email: input.email ?? null, phone: input.phone ?? null, address: input.address ?? null, taxId: input.taxId ?? null };
+      setVendors(vendors.map(v => v.id === selectedVendor.id ? { ...v, name: input.name, ...patch } : v));
+      setSelectedVendor({ ...selectedVendor, name: input.name, ...patch });
       setIsEditOpen(false);
     } else {
       setError(res.message || "Failed to update vendor.");

@@ -62,6 +62,7 @@ export default function CustomerManager({ initialCustomers }: CustomerManagerPro
         defaultArAccountId: null,
         defaultArAccountCode: null,
         defaultArAccountName: null,
+        arBalance: 0,
         status: "ACTIVE",
         createdBy: "general_accountant",
         createdAt: new Date().toISOString(),
@@ -80,6 +81,7 @@ export default function CustomerManager({ initialCustomers }: CustomerManagerPro
     setError(null);
     const form = new FormData(e.currentTarget as HTMLFormElement);
     const input = {
+      customerCode: selectedCustomer.customerCode,
       name: String(form.get("name") || "").trim(),
       email: String(form.get("email") || "").trim() || undefined,
       phone: String(form.get("phone") || "").trim() || undefined,
@@ -88,9 +90,9 @@ export default function CustomerManager({ initialCustomers }: CustomerManagerPro
     };
     const res = await updateCustomerAction(selectedCustomer.id, input);
     if (res.ok) {
-      const patch = { ...input, email: input.email ?? null, phone: input.phone ?? null, address: input.address ?? null, taxId: input.taxId ?? null };
-      setCustomers(customers.map(c => c.id === selectedCustomer.id ? { ...c, ...patch } : c));
-      setSelectedCustomer({ ...selectedCustomer, ...patch });
+      const patch = { email: input.email ?? null, phone: input.phone ?? null, address: input.address ?? null, taxId: input.taxId ?? null };
+      setCustomers(customers.map(c => c.id === selectedCustomer.id ? { ...c, name: input.name, ...patch } : c));
+      setSelectedCustomer({ ...selectedCustomer, name: input.name, ...patch });
       setIsEditOpen(false);
     } else {
       setError(res.message || "Failed to update customer.");

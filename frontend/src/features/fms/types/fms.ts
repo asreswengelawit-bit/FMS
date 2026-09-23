@@ -17,6 +17,7 @@ export type Account = {
   updatedAt: string | null;
   updatedBy: string | null;
   version: number;
+  balance: number;
 };
 
 export type CreateAccountInput = {
@@ -288,6 +289,9 @@ export type BudgetLine = {
   periodId: string;
   periodName: string;
   budgetedAmount: number;
+  budgetAmount?: number;
+  actualAmount?: number;
+  variance?: number;
   notes: string | null;
 };
 export type CreateBudgetInput = {
@@ -414,6 +418,7 @@ export type Vendor = {
   defaultApAccountId: string | null;
   defaultApAccountCode: string | null;
   defaultApAccountName: string | null;
+  apBalance: number;
   status: VendorStatus;
   createdBy: string;
   createdAt: string;
@@ -430,6 +435,7 @@ export type CreateVendorInput = {
   defaultApAccountId?: string;
 };
 export type UpdateVendorInput = {
+  vendorCode?: string;
   name: string;
   taxId?: string;
   email?: string;
@@ -497,6 +503,7 @@ export type Customer = {
   defaultArAccountId: string | null;
   defaultArAccountCode: string | null;
   defaultArAccountName: string | null;
+  arBalance: number;
   status: CustomerStatus;
   createdBy: string;
   createdAt: string;
@@ -514,6 +521,7 @@ export type CreateCustomerInput = {
   defaultArAccountId?: string;
 };
 export type UpdateCustomerInput = {
+  customerCode?: string;
   name: string;
   taxId?: string;
   email?: string;

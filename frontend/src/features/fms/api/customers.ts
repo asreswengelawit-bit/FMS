@@ -1,5 +1,49 @@
 import { fmsFetch } from "./fms-client";
-import type { Customer, CreateCustomerInput, UpdateCustomerInput, ArAgingReport, CustomerStatement, PagedResponse } from "../types/fms";
+import type { Customer, CreateCustomerInput, UpdateCustomerInput, ArAgingReport, CustomerStatement, PagedResponse, CustomerStatus } from "../types/fms";
+
+function fromApi(v: any): Customer {
+  return {
+    id: v.id,
+    customerCode: v.customerCode,
+    name: v.customerName ?? v.name ?? "",
+    taxId: v.taxId ?? null,
+    email: v.email ?? null,
+    phone: v.phoneNumber ?? v.phone ?? null,
+    address: v.address ?? null,
+    creditLimit: v.creditLimit ?? null,
+    paymentTerms: v.paymentTerms ?? "NET_30",
+    defaultArAccountId: v.defaultArAccountId ?? null,
+    defaultArAccountCode: v.defaultArAccountCode ?? null,
+    defaultArAccountName: v.defaultArAccountName ?? null,
+    arBalance: v.arBalance ?? 0,
+    status: (v.status ?? "ACTIVE") as CustomerStatus,
+    createdBy: v.createdBy ?? "",
+    createdAt: v.createdAt,
+    updatedAt: v.updatedAt ?? null,
+  };
+}
+
+function toCreateApi(input: CreateCustomerInput) {
+  return {
+    customerCode: input.customerCode,
+    customerName: input.name.trim(),
+    email: input.email?.trim() || null,
+    phoneNumber: input.phone?.trim() || null,
+    address: input.address?.trim() || null,
+    taxId: input.taxId?.trim() || null,
+  };
+}
+
+function toUpdateApi(input: UpdateCustomerInput) {
+  return {
+    customerCode: input.customerCode,
+    customerName: input.name.trim(),
+    email: input.email?.trim() || null,
+    phoneNumber: input.phone?.trim() || null,
+    address: input.address?.trim() || null,
+    taxId: input.taxId?.trim() || null,
+  };
+}
 
 export async function listCustomers(params?: { search?: string; status?: string; page?: number; size?: number }): Promise<PagedResponse<Customer>> {
   const sp = new URLSearchParams();
@@ -7,25 +51,28 @@ export async function listCustomers(params?: { search?: string; status?: string;
   if (params?.status) sp.set("status", params.status);
   sp.set("page", String(params?.page ?? 0));
   sp.set("size", String(params?.size ?? 20));
-  return fmsFetch<PagedResponse<Customer>>(`/api/fms/customers?${sp.toString()}`);
+  const res = await fmsFetch<PagedResponse<any>>(`/api/fms/customers?${sp.toString()}`);
+  return { ...res, content: (res.content ?? []).map(fromApi) };
 }
 
 export async function getCustomer(id: string): Promise<Customer> {
-  return fmsFetch<Customer>(`/api/fms/customers/${id}`);
+  return fromApi(await fmsFetch<any>(`/api/fms/customers/${id}`));
 }
 
 export async function createCustomer(input: CreateCustomerInput): Promise<Customer> {
-  return fmsFetch<Customer>("/api/fms/customers", {
+  const res = await fmsFetch<any>("/api/fms/customers", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify(toCreateApi(input)),
   });
+  return fromApi(res);
 }
 
 export async function updateCustomer(id: string, input: UpdateCustomerInput): Promise<Customer> {
-  return fmsFetch<Customer>(`/api/fms/customers/${id}`, {
+  const res = await fmsFetch<any>(`/api/fms/customers/${id}`, {
     method: "PUT",
-    body: JSON.stringify(input),
+    body: JSON.stringify(toUpdateApi(input)),
   });
+  return fromApi(res);
 }
 
 export async function getArAgingReport(asOfDate?: string): Promise<ArAgingReport> {

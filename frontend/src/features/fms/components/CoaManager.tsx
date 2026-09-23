@@ -73,6 +73,7 @@ export default function CoaManager({ initialAccounts }: CoaManagerProps) {
         updatedAt: null,
         updatedBy: null,
         version: 0,
+        balance: 0,
       };
       setAccounts([mockNew, ...accounts]);
       setIsCreateOpen(false);
